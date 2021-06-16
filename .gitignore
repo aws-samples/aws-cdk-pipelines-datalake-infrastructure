@@ -1,5 +1,15 @@
-target/
-.settings/
-build/
-target/classes/
-.idea
+# Copyright 2020 Amazon.com, Inc. or its affiliates. All Rights Reserved.
+# SPDX-License-Identifier: MIT-0
+*.swp
+package-lock.json
+__pycache__
+.pytest_cache
+.env
+.venv
+.vscode
+*.egg-info
+**/.DS_Store
+
+# CDK asset staging directory
+.cdk.staging
+cdk.out
