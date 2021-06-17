@@ -1,10 +1,12 @@
 # Copyright 2020 Amazon.com, Inc. or its affiliates. All Rights Reserved.
 # SPDX-License-Identifier: MIT-0
+
 import aws_cdk.core as cdk
 
 from .configuration import (
     get_logical_id_prefix, get_resource_name_prefix,
 )
+
 
 COST_CENTER = 'COST_CENTER'
 TAG_ENVIRONMENT = 'TAG_ENVIRONMENT'

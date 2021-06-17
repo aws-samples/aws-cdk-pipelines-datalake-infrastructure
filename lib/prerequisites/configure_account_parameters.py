@@ -1,10 +1,12 @@
 # Copyright 2020 Amazon.com, Inc. or its affiliates. All Rights Reserved.
 # SPDX-License-Identifier: MIT-0
+
+
 import boto3
 import re
 
 from lib.configuration import (
-    ACCOUNT_ID, DEPLOYMENT, DEV, GITHUB_REPOSITORY_NAME, GITHUB_REPOSITORY_OWNER_NAME, GITHUB_TOKEN,
+    ACCOUNT_ID, DEPLOYMENT, DEV, GITHUB_REPOSITORY_NAME, GITHUB_REPOSITORY_OWNER_NAME,
     LOGICAL_ID_PREFIX, REGION, RESOURCE_NAME_PREFIX, TEST, PROD, VPC_CIDR, get_path_mapping
 )
 
@@ -12,7 +14,6 @@ all_parameters = {
     DEPLOYMENT: {
         ACCOUNT_ID: '',
         REGION: 'us-west-2',
-        GITHUB_TOKEN: '',
         GITHUB_REPOSITORY_OWNER_NAME: '',
         GITHUB_REPOSITORY_NAME: '',
         LOGICAL_ID_PREFIX: '',
@@ -42,8 +43,10 @@ if __name__ == '__main__':
         for parameters_index, (parameter_key, parameter_value) in enumerate(parameter_value_mapping.items()):
             if not bool(parameter_value):
                 raise Exception(f'You must provide a value for: {parameter_key}')
-            elif parameter_key == RESOURCE_NAME_PREFIX and (not re.fullmatch('^[a-z|A-Z|0-9|-]+', parameter_value) or parameter_value[-1:] == '-'):
-                raise Exception(f'Resource names may only contain Alphanumeric and hyphens and cannot contain trailing hyphens')
+            elif parameter_key == RESOURCE_NAME_PREFIX and (
+                not re.fullmatch('^[a-z|0-9|-]+', parameter_value or '-' in parameter_value[-1:] or '-' in parameter_value[1]
+            )):
+                raise Exception(f'Resource names may only contain lowercase Alphanumeric and hyphens, but cannot contain leading or trailing hyphens')
 
     response = input((
         f'Are you sure you want to deploy:\n\n{all_parameters}\n\n'
