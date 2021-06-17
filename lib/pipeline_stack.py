@@ -37,7 +37,7 @@ class PipelineStack(cdk.Stack):
         resource_name_prefix = get_resource_name_prefix()
 
         pipeline = pipelines.CdkPipeline(self, f'{target_environment}{logical_id_prefix}InfrastructurePipeline',
-            pipeline_name=f'{target_environment}-{resource_name_prefix}-infrastructure-pipeline',
+            pipeline_name=f'{target_environment.lower()}-{resource_name_prefix}-infrastructure-pipeline',
             cloud_assembly_artifact=cloud_assembly_artifact,
             source_action=codepipeline_actions.GitHubSourceAction(
                 action_name='GitHub',
