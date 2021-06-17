@@ -1,5 +1,6 @@
 # Copyright 2020 Amazon.com, Inc. or its affiliates. All Rights Reserved.
 # SPDX-License-Identifier: MIT-0
+
 set -e
 
 if aws sts get-caller-identity > /dev/null; then

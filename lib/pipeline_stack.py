@@ -1,5 +1,6 @@
 # Copyright 2020 Amazon.com, Inc. or its affiliates. All Rights Reserved.
 # SPDX-License-Identifier: MIT-0
+
 import aws_cdk.core as cdk
 import aws_cdk.pipelines as pipelines
 import aws_cdk.aws_iam as iam
@@ -7,10 +8,10 @@ import aws_cdk.aws_codepipeline as codepipeline
 import aws_cdk.aws_codepipeline_actions as codepipeline_actions
 
 from .configuration import (
-    DEPLOYMENT, GITHUB_TOKEN, VPC_ID, AVAILABILITY_ZONES, SUBNET_IDS, ROUTE_TABLES,
+    CROSS_ACCOUNT_DYNAMODB_ROLE, DEPLOYMENT, GITHUB_TOKEN, VPC_ID, AVAILABILITY_ZONES, SUBNET_IDS, ROUTE_TABLES,
     SHARED_SECURITY_GROUP_ID, S3_KMS_KEY, S3_ACCESS_LOG_BUCKET, S3_RAW_BUCKET, S3_CONFORMED_BUCKET,
-    S3_PURPOSE_BUILT_BUCKET, get_logical_id_prefix, get_path_mapping,  get_repository_name,
-    get_repository_owner,
+    S3_PURPOSE_BUILT_BUCKET, get_logical_id_prefix, get_resource_name_prefix,
+    get_path_mapping,  get_repository_name, get_repository_owner,
 )
 from .pipeline_deploy_stage import PipelineDeployStage
 
@@ -25,18 +26,18 @@ class PipelineStack(cdk.Stack):
         self.create_environment_pipeline(
             target_environment,
             target_branch,
-            { 'account': self.account, 'region': self.region },
             target_aws_env
         )
 
-    def create_environment_pipeline(self, target_environment, target_branch, deployment_aws_env, target_aws_env):
+    def create_environment_pipeline(self, target_environment, target_branch, target_aws_env):
         source_artifact = codepipeline.Artifact()
         cloud_assembly_artifact = codepipeline.Artifact()
 
         logical_id_prefix = get_logical_id_prefix()
+        resource_name_prefix = get_resource_name_prefix()
 
         pipeline = pipelines.CdkPipeline(self, f'{target_environment}{logical_id_prefix}InfrastructurePipeline',
-            pipeline_name=f'{target_environment}{logical_id_prefix}InfrastructurePipeline',
+            pipeline_name=f'{target_environment}-{resource_name_prefix}-infrastructure-pipeline',
             cloud_assembly_artifact=cloud_assembly_artifact,
             source_action=codepipeline_actions.GitHubSourceAction(
                 action_name='GitHub',
@@ -59,7 +60,7 @@ class PipelineStack(cdk.Stack):
                             'ssm:*',
                         ],
                         resources=[
-                            f'arn:aws:ssm:{deployment_aws_env["region"]}:{deployment_aws_env["account"]}:parameter/DataLake/*',
+                            f'arn:aws:ssm:{self.region}:{self.account}:parameter/DataLake/*',
                         ],
                     ),
                     iam.PolicyStatement(
@@ -69,7 +70,7 @@ class PipelineStack(cdk.Stack):
                             'secretsmanager:*',
                         ],
                         resources=[
-                            f'arn:aws:secretsmanager:{deployment_aws_env["region"]}:{deployment_aws_env["account"]}:secret:/DataLake/*',
+                            f'arn:aws:secretsmanager:{self.region}:{self.account}:secret:/DataLake/*',
                         ],
                     ),
                     iam.PolicyStatement(
@@ -110,7 +111,7 @@ class PipelineStack(cdk.Stack):
 
         deploy_stage = PipelineDeployStage(self, target_environment,
             target_environment=target_environment,
-            deployment_account_id=deployment_aws_env['account'],
+            deployment_account_id=self.account,
             env=target_aws_env,
         )
         app_stage = pipeline.add_application_stage(deploy_stage)
@@ -199,6 +200,14 @@ class PipelineStack(cdk.Stack):
                         --type String \
                         --overwrite
                 """,
+                f"""
+                    aws ssm put-parameter \
+                        --name {self.mappings[target_environment][CROSS_ACCOUNT_DYNAMODB_ROLE]} \
+                        --description 'ARN of the cross account DynamoDb Role' \
+                        --value $CROSS_ACCOUNT_DYNAMODB_ROLE \
+                        --type String \
+                        --overwrite
+                """,
             ],
             use_outputs={
                 'VPC_ID': pipeline.stack_output(deploy_stage.vpc_id),
@@ -211,6 +220,7 @@ class PipelineStack(cdk.Stack):
                 'RAW_BUCKET_NAME': pipeline.stack_output(deploy_stage.raw_bucket),
                 'CONFORMED_BUCKET_NAME': pipeline.stack_output(deploy_stage.conformed_bucket),
                 'PURPOSE_BUILT_BUCKET_NAME': pipeline.stack_output(deploy_stage.purpose_built_bucket),
+                'CROSS_ACCOUNT_DYNAMODB_ROLE': pipeline.stack_output(deploy_stage.cross_account_role),
             },
             role_policy_statements=[
                 iam.PolicyStatement(
@@ -220,7 +230,7 @@ class PipelineStack(cdk.Stack):
                         'ssm:*',
                     ],
                     resources=[
-                        f'arn:aws:ssm:{deployment_aws_env["region"]}:{deployment_aws_env["account"]}:parameter/DataLake/*',
+                        f'arn:aws:ssm:{self.region}:{self.account}:parameter/DataLake/*',
                     ],
                 )]
             ))

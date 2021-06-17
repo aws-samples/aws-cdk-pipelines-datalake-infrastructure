@@ -1,5 +1,6 @@
 # Copyright 2020 Amazon.com, Inc. or its affiliates. All Rights Reserved.
 # SPDX-License-Identifier: MIT-0
+
 import aws_cdk.aws_iam as iam
 import aws_cdk.core as cdk
 import aws_cdk.aws_kms as kms
@@ -12,7 +13,6 @@ from .configuration import (
 
 
 class S3BucketZonesStack(cdk.Stack):
-
     def __init__(self, scope: cdk.Construct, construct_id: str, target_environment: str, deployment_account_id: str, **kwargs) -> None:
         super().__init__(scope, construct_id, **kwargs)
 
@@ -29,27 +29,31 @@ class S3BucketZonesStack(cdk.Stack):
         )
 
         access_logs_bucket = self.create_access_logs_bucket(
-            f'{resource_name_prefix}-{self.account}-{self.region}-access-logs',
+            f'{target_environment}{logical_id_prefix}AccessLogsBucket',
+            f'{target_environment.lower()}-{resource_name_prefix}-{self.account}-{self.region}-access-logs',
             s3_kms_key,
         )
-        
+
         raw_bucket = self.create_data_lake_zone_bucket(
             target_environment,
-            f'{resource_name_prefix}-{self.account}-{self.region}-raw',
+            f'{target_environment}{logical_id_prefix}RawBucket',
+            f'{target_environment.lower()}-{resource_name_prefix}-{self.account}-{self.region}-raw',
             f'{logical_id_prefix}RawBucketAccountOnlyAccess',
             access_logs_bucket,
             s3_kms_key,
         )
         conformed_bucket = self.create_data_lake_zone_bucket(
             target_environment,
-            f'{resource_name_prefix}-{self.account}-{self.region}-conformed',
+            f'{target_environment}{logical_id_prefix}ConformedBucket',
+            f'{target_environment.lower()}-{resource_name_prefix}-{self.account}-{self.region}-conformed',
             f'{logical_id_prefix}ConformedBucketAccountOnlyAccess',
             access_logs_bucket,
             s3_kms_key,
         )
         purpose_built_bucket = self.create_data_lake_zone_bucket(
             target_environment,
-            f'{resource_name_prefix}-{self.account}-{self.region}-purposebuilt',
+            f'{target_environment}{logical_id_prefix}PurposeBuiltBucket',
+            f'{target_environment.lower()}-{resource_name_prefix}-{self.account}-{self.region}-purposebuilt',
             f'{logical_id_prefix}PurposeBuiltBucketAccountOnlyAccess',
             access_logs_bucket,
             s3_kms_key,
@@ -69,7 +73,7 @@ class S3BucketZonesStack(cdk.Stack):
             admins=[iam.AccountPrincipal(self.account)], # Gives account users admin access to the key
             description='Key used for encrypting Data Lake S3 Buckets',
             removal_policy=self.removal_policy,
-            )
+        )
         # Gives account users and deployment account users access to use the key
         s3_kms_key.add_to_resource_policy(
             iam.PolicyStatement(
@@ -85,12 +89,13 @@ class S3BucketZonesStack(cdk.Stack):
                     'kms:DescribeKey',
                 ],
                 resources=[s3_kms_key.key_arn],
-            ))
+            )
+        )
 
         return s3_kms_key
 
     def create_data_lake_zone_bucket(
-        self, bucket_name, access_logs_bucket, s3_kms_key
+        self, logical_id, bucket_name, access_logs_bucket, s3_kms_key
     ) -> s3.Bucket:
 
         lifecycle_rules = [
@@ -98,7 +103,8 @@ class S3BucketZonesStack(cdk.Stack):
                 enabled=True,
                 expiration=cdk.Duration.days(60),
                 noncurrent_version_expiration=cdk.Duration.days(30),
-            )]
+            )
+        ]
 
         if (self.target_environment == PROD):
             lifecycle_rules = [
@@ -112,11 +118,12 @@ class S3BucketZonesStack(cdk.Stack):
                             transition_after=cdk.Duration.days(365),
                         )
                     ]
-                )]
+                )
+            ]
 
         bucket = s3.Bucket(
             self,
-            id=bucket_name,
+            id=logical_id,
             access_control=s3.BucketAccessControl.PRIVATE,
             block_public_access=s3.BlockPublicAccess.BLOCK_ALL,
             bucket_key_enabled=True,
@@ -130,7 +137,7 @@ class S3BucketZonesStack(cdk.Stack):
             object_ownership=s3.ObjectOwnership.OBJECT_WRITER,
             server_access_logs_bucket=access_logs_bucket,
             server_access_logs_prefix=bucket_name,
-            )
+        )
 
         policy_document_statements = [
             iam.PolicyStatement(
@@ -143,7 +150,8 @@ class S3BucketZonesStack(cdk.Stack):
                 ],
                 resources=[f'{bucket.bucket_arn}/*'],
                 conditions=[{'Bool': { 'aws:SecureTransport': 'false' }}]
-            )]
+            )
+        ]
         
         # Prevents user deletion of buckets
         if self.target_environment == PROD or self.target_environment == TEST:
@@ -166,11 +174,11 @@ class S3BucketZonesStack(cdk.Stack):
         return bucket
 
     def create_access_logs_bucket(
-        self, bucket_name, s3_kms_key
+        self, logical_id, bucket_name, s3_kms_key
     ) -> s3.Bucket:
         bucket = s3.Bucket(
             self,
-            id=bucket_name,
+            id=logical_id,
             access_control=s3.BucketAccessControl.LOG_DELIVERY_WRITE,
             block_public_access=s3.BlockPublicAccess.BLOCK_ALL,
             bucket_key_enabled=True,
@@ -181,6 +189,6 @@ class S3BucketZonesStack(cdk.Stack):
             removal_policy=cdk.RemovalPolicy.RETAIN,
             versioned=True,
             object_ownership=s3.ObjectOwnership.BUCKET_OWNER_PREFERRED,
-            )
+        )
 
         return bucket

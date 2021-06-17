@@ -1,6 +1,8 @@
 # Copyright 2020 Amazon.com, Inc. or its affiliates. All Rights Reserved.
 # SPDX-License-Identifier: MIT-0
+
 import boto3
+
 
 # Environments (targeted at accounts)
 DEPLOYMENT = 'Deployment'
@@ -30,6 +32,7 @@ S3_ACCESS_LOG_BUCKET = 's3_access_log_bucket'
 S3_RAW_BUCKET = 's3_raw_bucket'
 S3_CONFORMED_BUCKET = 's3_conformed_bucket'
 S3_PURPOSE_BUILT_BUCKET = 's3_purpose_built_bucket'
+CROSS_ACCOUNT_DYNAMODB_ROLE = 'cross_account_dynamodb_role'
 
 
 def get_path_mapping(environment: str) -> dict:
@@ -48,6 +51,7 @@ def get_path_mapping(environment: str) -> dict:
         S3_RAW_BUCKET: f'/DataLake/{environment}/RawBucketName',
         S3_CONFORMED_BUCKET: f'/DataLake/{environment}/ConformedBucketName',
         S3_PURPOSE_BUILT_BUCKET: f'/DataLake/{environment}/PurposeBuiltBucketName',
+        CROSS_ACCOUNT_DYNAMODB_ROLE: f'/DataLake/{environment}/CrossAccountDynamoDbRoleArn'
     }
 
 def get_path_mappings() -> dict:

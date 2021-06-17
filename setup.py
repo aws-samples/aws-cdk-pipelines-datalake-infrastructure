@@ -1,5 +1,6 @@
 # Copyright 2020 Amazon.com, Inc. or its affiliates. All Rights Reserved.
 # SPDX-License-Identifier: MIT-0
+
 import setuptools
 
 
@@ -15,13 +16,12 @@ setuptools.setup(
     long_description=long_description,
     long_description_content_type="text/markdown",
 
-    author="Isaiah Grant <igrant@2ndwatch.com>, Zahid Muhammad Ali <zhidli@amazon.com>, Ravi Itha <itharav@amazon.com>",
+    author="Isaiah Grant <igrant@2ndwatch.com>, Ravi Itha <itharav@amazon.com>, Zahid Muhammad Ali <zhidli@amazon.com>",
 
-    # package_dir={"": "lib"},
     packages=setuptools.find_packages(),
 
     install_requires=[
-        "aws-cdk.core==1.105.0",
+        "aws-cdk.core==1.109.0",
     ],
 
     python_requires=">=3.6",
