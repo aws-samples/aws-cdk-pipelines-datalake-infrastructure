@@ -11,7 +11,7 @@ from .configuration import (
     CROSS_ACCOUNT_DYNAMODB_ROLE, DEPLOYMENT, GITHUB_TOKEN, VPC_ID, AVAILABILITY_ZONES, SUBNET_IDS, ROUTE_TABLES,
     SHARED_SECURITY_GROUP_ID, S3_KMS_KEY, S3_ACCESS_LOG_BUCKET, S3_RAW_BUCKET, S3_CONFORMED_BUCKET,
     S3_PURPOSE_BUILT_BUCKET, get_logical_id_prefix, get_resource_name_prefix,
-    get_path_mapping,  get_repository_name, get_repository_owner,
+    get_path_mappings,  get_repository_name, get_repository_owner,
 )
 from .pipeline_deploy_stage import PipelineDeployStage
 
@@ -21,7 +21,7 @@ class PipelineStack(cdk.Stack):
     def __init__(self, scope: cdk.Construct, id: str, target_environment: str, target_branch: str, target_aws_env: dict, **kwargs) -> None:
         super().__init__(scope, id, **kwargs)
 
-        self.mappings = get_path_mapping(target_environment)
+        self.mappings = get_path_mappings()
 
         self.create_environment_pipeline(
             target_environment,

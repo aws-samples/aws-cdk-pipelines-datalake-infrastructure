@@ -1,19 +1,19 @@
 # Copyright 2020 Amazon.com, Inc. or its affiliates. All Rights Reserved.
 # SPDX-License-Identifier: MIT-0
 
-#!/usr/bin/env python3
+# !/usr/bin/env python3
+
 import os
 import boto3
-import aws_cdk as cdk
+import aws_cdk.core as cdk
 
 from lib.pipeline_stack import PipelineStack
 from lib.empty_stack import EmptyStack
 from lib.configuration import (
-    ACCOUNT_ID, DEPLOYMENT, DEV, TEST, PROD, REGION, 
+    ACCOUNT_ID, DEPLOYMENT, DEV, TEST, PROD, REGION,
     get_logical_id_prefix, get_path_mappings,
 )
 from lib.tagging import tag
-
 
 app = cdk.App()
 
@@ -32,8 +32,8 @@ else:
     dev_region = client.get_parameter(Name=raw_mappings[DEV][REGION])['Parameter']['Value']
     test_account = client.get_parameter(Name=raw_mappings[TEST][ACCOUNT_ID])['Parameter']['Value']
     test_region = client.get_parameter(Name=raw_mappings[TEST][REGION])['Parameter']['Value']
-    prod_account=client.get_parameter(Name=raw_mappings[PROD][ACCOUNT_ID])['Parameter']['Value']
-    prod_region=client.get_parameter(Name=raw_mappings[PROD][REGION])['Parameter']['Value']
+    prod_account = client.get_parameter(Name=raw_mappings[PROD][ACCOUNT_ID])['Parameter']['Value']
+    prod_region = client.get_parameter(Name=raw_mappings[PROD][REGION])['Parameter']['Value']
 
     deployment_aws_env = {
         'account': deployment_account,
@@ -62,7 +62,7 @@ else:
         target_aws_env=dev_aws_env,
         env=deployment_aws_env,
     )
-    tag(dev_pipeline_stack, deployment_environment=DEPLOYMENT)
+    tag(dev_pipeline_stack, DEPLOYMENT)
 
     target_environment = TEST
     test_pipeline_stack = PipelineStack(
@@ -73,7 +73,7 @@ else:
         target_aws_env=test_aws_env,
         env=deployment_aws_env,
     )
-    tag(test_pipeline_stack, deployment_environment=DEPLOYMENT)
+    tag(test_pipeline_stack, DEPLOYMENT)
 
     target_environment = PROD
     prod_pipeline_stack = PipelineStack(
@@ -84,6 +84,6 @@ else:
         target_aws_env=prod_aws_env,
         env=deployment_aws_env,
     )
-    tag(prod_pipeline_stack, deployment_environment=DEPLOYMENT)
+    tag(prod_pipeline_stack, DEPLOYMENT)
 
 app.synth()

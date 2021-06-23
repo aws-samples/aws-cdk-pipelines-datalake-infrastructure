@@ -13,48 +13,41 @@ from .configuration import (
 
 
 class S3BucketZonesStack(cdk.Stack):
-    def __init__(self, scope: cdk.Construct, construct_id: str, target_environment: str, deployment_account_id: str, **kwargs) -> None:
+    def __init__(self, scope: cdk.Construct, construct_id: str, target_environment: str, deployment_account_id: str,
+                 **kwargs) -> None:
         super().__init__(scope, construct_id, **kwargs)
 
         self.target_environment = target_environment
         logical_id_prefix = get_logical_id_prefix()
         resource_name_prefix = get_resource_name_prefix()
 
-        self.removal_policy = cdk.RemovalPolicy.RETAIN if (target_environment == PROD 
-            or target_environment == TEST) else cdk.RemovalPolicy.DESTROY
+        self.removal_policy = cdk.RemovalPolicy.RETAIN if (target_environment == PROD
+                                                           or target_environment == TEST) else cdk.RemovalPolicy.DESTROY
 
         s3_kms_key = self.create_kms_key(
             deployment_account_id,
             logical_id_prefix,
         )
-
         access_logs_bucket = self.create_access_logs_bucket(
             f'{target_environment}{logical_id_prefix}AccessLogsBucket',
             f'{target_environment.lower()}-{resource_name_prefix}-{self.account}-{self.region}-access-logs',
             s3_kms_key,
         )
-
         raw_bucket = self.create_data_lake_zone_bucket(
-            target_environment,
             f'{target_environment}{logical_id_prefix}RawBucket',
             f'{target_environment.lower()}-{resource_name_prefix}-{self.account}-{self.region}-raw',
-            f'{logical_id_prefix}RawBucketAccountOnlyAccess',
             access_logs_bucket,
             s3_kms_key,
         )
         conformed_bucket = self.create_data_lake_zone_bucket(
-            target_environment,
             f'{target_environment}{logical_id_prefix}ConformedBucket',
             f'{target_environment.lower()}-{resource_name_prefix}-{self.account}-{self.region}-conformed',
-            f'{logical_id_prefix}ConformedBucketAccountOnlyAccess',
             access_logs_bucket,
             s3_kms_key,
         )
         purpose_built_bucket = self.create_data_lake_zone_bucket(
-            target_environment,
             f'{target_environment}{logical_id_prefix}PurposeBuiltBucket',
             f'{target_environment.lower()}-{resource_name_prefix}-{self.account}-{self.region}-purposebuilt',
-            f'{logical_id_prefix}PurposeBuiltBucketAccountOnlyAccess',
             access_logs_bucket,
             s3_kms_key,
         )
@@ -66,14 +59,11 @@ class S3BucketZonesStack(cdk.Stack):
         self.conformed_bucket = conformed_bucket
         self.purpose_built_bucket = purpose_built_bucket
 
-    def create_kms_key(
-        self, deployment_account_id, logical_id_prefix,
-    ) -> kms.Key:
+    def create_kms_key(self, deployment_account_id, logical_id_prefix,) -> kms.Key:
         s3_kms_key = kms.Key(self, f'{self.target_environment}{logical_id_prefix}KmsKey',
-            admins=[iam.AccountPrincipal(self.account)], # Gives account users admin access to the key
-            description='Key used for encrypting Data Lake S3 Buckets',
-            removal_policy=self.removal_policy,
-        )
+                             admins=[iam.AccountPrincipal(self.account)],  # Gives account users admin access to the key
+                             description='Key used for encrypting Data Lake S3 Buckets',
+                             removal_policy=self.removal_policy,)
         # Gives account users and deployment account users access to use the key
         s3_kms_key.add_to_resource_policy(
             iam.PolicyStatement(
@@ -94,10 +84,7 @@ class S3BucketZonesStack(cdk.Stack):
 
         return s3_kms_key
 
-    def create_data_lake_zone_bucket(
-        self, logical_id, bucket_name, access_logs_bucket, s3_kms_key
-    ) -> s3.Bucket:
-
+    def create_data_lake_zone_bucket(self, logical_id, bucket_name, access_logs_bucket, s3_kms_key) -> s3.Bucket:
         lifecycle_rules = [
             s3.LifecycleRule(
                 enabled=True,
@@ -105,8 +92,7 @@ class S3BucketZonesStack(cdk.Stack):
                 noncurrent_version_expiration=cdk.Duration.days(30),
             )
         ]
-
-        if (self.target_environment == PROD):
+        if self.target_environment == PROD:
             lifecycle_rules = [
                 s3.LifecycleRule(
                     enabled=True,
@@ -120,7 +106,6 @@ class S3BucketZonesStack(cdk.Stack):
                     ]
                 )
             ]
-
         bucket = s3.Bucket(
             self,
             id=logical_id,
@@ -149,10 +134,10 @@ class S3BucketZonesStack(cdk.Stack):
                     's3:PutObject',
                 ],
                 resources=[f'{bucket.bucket_arn}/*'],
-                conditions=[{'Bool': { 'aws:SecureTransport': 'false' }}]
+                conditions=[{'Bool': {'aws:SecureTransport': 'false'}}]
             )
         ]
-        
+
         # Prevents user deletion of buckets
         if self.target_environment == PROD or self.target_environment == TEST:
             policy_document_statements.append(
@@ -164,18 +149,16 @@ class S3BucketZonesStack(cdk.Stack):
                         's3:DeleteBucket',
                     ],
                     resources=[bucket.bucket_arn],
-                    conditions=[{'StringLike': { 'aws:userId': f'arn:aws:iam::{self.account_id}:user/*'}}]
+                    conditions=[{'StringLike': {'aws:userId': f'arn:aws:iam::{self.account}:user/*'}}]
                 )
             )
-        
+
         for statement in policy_document_statements:
             bucket.add_to_resource_policy(statement)
 
         return bucket
 
-    def create_access_logs_bucket(
-        self, logical_id, bucket_name, s3_kms_key
-    ) -> s3.Bucket:
+    def create_access_logs_bucket(self, logical_id, bucket_name, s3_kms_key) -> s3.Bucket:
         bucket = s3.Bucket(
             self,
             id=logical_id,

@@ -3,7 +3,6 @@
 
 import boto3
 
-
 # Environments (targeted at accounts)
 DEPLOYMENT = 'Deployment'
 DEV = 'Dev'
@@ -12,7 +11,8 @@ PROD = 'Prod'
 
 # The following constants are used to map to parameter/secret paths
 ENVIRONMENT = 'environment'
-## Manual Inputs
+
+# Manual Inputs
 GITHUB_REPOSITORY_OWNER_NAME = 'github_repository_owner_name'
 GITHUB_REPOSITORY_NAME = 'github_repository_name'
 GITHUB_TOKEN = 'github_token'
@@ -21,7 +21,8 @@ REGION = 'region'
 LOGICAL_ID_PREFIX = 'logical_id_prefix'
 RESOURCE_NAME_PREFIX = 'resource_name_prefix'
 VPC_CIDR = 'vpc_cidr'
-## Used in Automated Outputs
+
+# Used in Automated Outputs
 VPC_ID = 'vpc_id'
 AVAILABILITY_ZONES = 'availability_zones'
 SUBNET_IDS = 'subnet_ids'
@@ -54,9 +55,9 @@ def get_path_mapping(environment: str) -> dict:
         CROSS_ACCOUNT_DYNAMODB_ROLE: f'/DataLake/{environment}/CrossAccountDynamoDbRoleArn'
     }
 
+
 def get_path_mappings() -> dict:
     """Returns a dict mapping of all keys used for configurations of environments.
-    
     These keys correspond to Parameter Store or Secrets Manager (passwords only) records.
     """
     return {
@@ -64,7 +65,7 @@ def get_path_mappings() -> dict:
             ENVIRONMENT: DEPLOYMENT,
             ACCOUNT_ID: f'/DataLake/{DEPLOYMENT}/AccountId',
             REGION: f'/DataLake/{DEPLOYMENT}/Region',
-            GITHUB_TOKEN: '/DataLake/GithubToken',
+            GITHUB_TOKEN: '/DataLake/GitHubToken',
             GITHUB_REPOSITORY_OWNER_NAME: f'/DataLake/Infrastructure/RepositoryOwnerName',
             GITHUB_REPOSITORY_NAME: f'/DataLake/Infrastructure/RepositoryName',
             LOGICAL_ID_PREFIX: f'/DataLake/Infrastructure/CloudFormationLogicalIdPrefix',
@@ -75,17 +76,22 @@ def get_path_mappings() -> dict:
         PROD: get_path_mapping(PROD),
     }
 
+
 def get_ssm_parameter(parameter_key: str):
     return boto3.client('ssm').get_parameter(Name=parameter_key)['Parameter']['Value']
 
+
 def get_logical_id_prefix() -> str:
-    return get_ssm_parameter(get_path_mapping(DEPLOYMENT)[LOGICAL_ID_PREFIX])
+    return get_ssm_parameter(get_path_mappings()[DEPLOYMENT][LOGICAL_ID_PREFIX])
+
 
 def get_resource_name_prefix() -> str:
-    return get_ssm_parameter(get_path_mapping(DEPLOYMENT)[RESOURCE_NAME_PREFIX])
+    return get_ssm_parameter(get_path_mappings()[DEPLOYMENT][RESOURCE_NAME_PREFIX])
+
 
 def get_repository_owner() -> str:
-    return get_ssm_parameter(get_path_mapping(DEPLOYMENT)[GITHUB_REPOSITORY_OWNER_NAME])
+    return get_ssm_parameter(get_path_mappings()[DEPLOYMENT][GITHUB_REPOSITORY_OWNER_NAME])
+
 
 def get_repository_name() -> str:
-    return get_ssm_parameter(get_path_mapping(DEPLOYMENT)[GITHUB_REPOSITORY_NAME])
+    return get_ssm_parameter(get_path_mappings()[DEPLOYMENT][GITHUB_REPOSITORY_NAME])

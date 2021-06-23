@@ -8,14 +8,19 @@ if [ -z $1 ] ; then
     exit 1
 fi
 
+if [ -z $2 ] ; then
+    echo "You must provide cloudformation execution IAM policies "
+    exit 1
+fi
+
 
 if aws sts get-caller-identity > /dev/null; then
     export CDK_NEW_BOOTSTRAP=1
-    export IS_BOOTS
+    export IS_BOOTSTRAP=1
     
-    read -r -p "Are you sure you want to bootstrap $(aws sts get-caller-identity) providing a trust relationship to: $1? (y/n) " response
+    read -r -p "Are you sure you want to bootstrap $(aws sts get-caller-identity) providing a trust relationship to: $1 using policy $2? (y/n) " response
     if [[ "$response" =~ ^([yY][eE][sS]|[yY])$ ]]; then
-        cdk bootstrap --trust $1 || (unset IS_BOOTSTRAP && unset CDK_NEW_BOOTSTRAP)
+        cdk bootstrap --trust $1 --cloudformation-execution-policies $2 || (unset IS_BOOTSTRAP && unset CDK_NEW_BOOTSTRAP)
         unset IS_BOOTSTRAP && unset CDK_NEW_BOOTSTRAP
     fi
 else

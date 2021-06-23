@@ -15,7 +15,7 @@ APPLICATION = 'APPLICATION'
 
 
 def tag(stack, target_environment: str):
-    '''Adds a tag to all constructs in the stack'''
+    """Adds a tag to all constructs in the stack"""
 
     cdk.Tags.of(stack).add(*get_tag(COST_CENTER, target_environment))
     cdk.Tags.of(stack).add(*get_tag(TAG_ENVIRONMENT, target_environment))
