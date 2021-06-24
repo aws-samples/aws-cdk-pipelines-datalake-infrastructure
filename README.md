@@ -23,7 +23,7 @@ This solution helps you:
   * [Software installation](#software-installation)
   * [AWS environment bootstrapping](#aws-environment-bootstrapping)
   * [Application configuration](#application-configuration)
-  * [Integration of AWS CodePipeline and GitHub.com](#integration-of-aws-codepipeline-and-github.com)
+  * [AWS CodePipeline and GitHub Integration](#aws-codepipeline-and-github-integration)
 * [Deployment](#deployment)
   * [Deploying for the first time](#deploying-for-the-first-time)
   * [Iterative Deployment](#iterative-deployment)
@@ -408,7 +408,7 @@ Before we deploy our resources we must provide the manual variables and upon dep
 
 ---
 
-### Integration of AWS CodePipeline and GitHub.com
+### AWS CodePipeline and GitHub integration
 
 Integration between AWS CodePipeline and GitHub requires a personal access token. This access token is stored in Secrets Manager. This is a one-time setup and is applicable for all target AWS environments and all repositories created under the organization in GitHub.com. Follow the below steps:
 
@@ -488,8 +488,8 @@ Refer to [cdk_instructions.md](./resources/cdk_instructions.md) for detailed ins
 ## Contributors
 
 1. **Isaiah Grant**, Cloud Consultant, 2nd Watch, Inc.
-1. **Ravi Itha**, Senior Data Architect, Amazon Web Services
-1. **Muhammad Zahid Ali**, Data Architect, Amazon Web Services
+1. **Ravi Itha**, Senior Data Architect, Amazon Web Services Inc.
+1. **Muhammad Zahid Ali**, Data Architect, Amazon Web Services Inc.
 
 ---
 
