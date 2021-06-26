@@ -16,14 +16,11 @@ class S3BucketZonesStack(cdk.Stack):
     def __init__(self, scope: cdk.Construct, construct_id: str, target_environment: str, deployment_account_id: str,
                  **kwargs) -> None:
         super().__init__(scope, construct_id, **kwargs)
-
         self.target_environment = target_environment
         logical_id_prefix = get_logical_id_prefix()
         resource_name_prefix = get_resource_name_prefix()
-
         self.removal_policy = cdk.RemovalPolicy.RETAIN if (target_environment == PROD
                                                            or target_environment == TEST) else cdk.RemovalPolicy.DESTROY
-
         s3_kms_key = self.create_kms_key(
             deployment_account_id,
             logical_id_prefix,
@@ -51,7 +48,6 @@ class S3BucketZonesStack(cdk.Stack):
             access_logs_bucket,
             s3_kms_key,
         )
-
         # Assign resources for export to SSM Parameter Store
         self.s3_kms_key = s3_kms_key
         self.access_logs_bucket = access_logs_bucket
@@ -137,7 +133,6 @@ class S3BucketZonesStack(cdk.Stack):
                 conditions=[{'Bool': {'aws:SecureTransport': 'false'}}]
             )
         ]
-
         # Prevents user deletion of buckets
         if self.target_environment == PROD or self.target_environment == TEST:
             policy_document_statements.append(
@@ -152,10 +147,8 @@ class S3BucketZonesStack(cdk.Stack):
                     conditions=[{'StringLike': {'aws:userId': f'arn:aws:iam::{self.account}:user/*'}}]
                 )
             )
-
         for statement in policy_document_statements:
             bucket.add_to_resource_policy(statement)
-
         return bucket
 
     def create_access_logs_bucket(self, logical_id, bucket_name, s3_kms_key) -> s3.Bucket:
@@ -173,5 +166,4 @@ class S3BucketZonesStack(cdk.Stack):
             versioned=True,
             object_ownership=s3.ObjectOwnership.BUCKET_OWNER_PREFERRED,
         )
-
         return bucket

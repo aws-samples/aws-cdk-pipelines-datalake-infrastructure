@@ -11,18 +11,17 @@ from .configuration import (
     CROSS_ACCOUNT_DYNAMODB_ROLE, DEPLOYMENT, GITHUB_TOKEN, VPC_ID, AVAILABILITY_ZONES, SUBNET_IDS, ROUTE_TABLES,
     SHARED_SECURITY_GROUP_ID, S3_KMS_KEY, S3_ACCESS_LOG_BUCKET, S3_RAW_BUCKET, S3_CONFORMED_BUCKET,
     S3_PURPOSE_BUILT_BUCKET, get_logical_id_prefix, get_resource_name_prefix,
-    get_path_mappings,  get_repository_name, get_repository_owner,
+    get_path_mappings, get_repository_name, get_repository_owner,
 )
 from .pipeline_deploy_stage import PipelineDeployStage
 
 
 class PipelineStack(cdk.Stack):
 
-    def __init__(self, scope: cdk.Construct, id: str, target_environment: str, target_branch: str, target_aws_env: dict, **kwargs) -> None:
+    def __init__(self, scope: cdk.Construct, id: str, target_environment: str, target_branch: str, target_aws_env: dict,
+                 **kwargs) -> None:
         super().__init__(scope, id, **kwargs)
-
         self.mappings = get_path_mappings()
-
         self.create_environment_pipeline(
             target_environment,
             target_branch,
@@ -32,92 +31,91 @@ class PipelineStack(cdk.Stack):
     def create_environment_pipeline(self, target_environment, target_branch, target_aws_env):
         source_artifact = codepipeline.Artifact()
         cloud_assembly_artifact = codepipeline.Artifact()
-
         logical_id_prefix = get_logical_id_prefix()
         resource_name_prefix = get_resource_name_prefix()
-
         pipeline = pipelines.CdkPipeline(self, f'{target_environment}{logical_id_prefix}InfrastructurePipeline',
-            pipeline_name=f'{target_environment.lower()}-{resource_name_prefix}-infrastructure-pipeline',
-            cloud_assembly_artifact=cloud_assembly_artifact,
-            source_action=codepipeline_actions.GitHubSourceAction(
-                action_name='GitHub',
-                branch=target_branch,
-                output=source_artifact,
-                oauth_token=cdk.SecretValue.secrets_manager(self.mappings[DEPLOYMENT][GITHUB_TOKEN]),
-                trigger=codepipeline_actions.GitHubTrigger.POLL,
-                owner=get_repository_owner(),
-                repo=get_repository_name(),
-            ),
-            synth_action=pipelines.SimpleSynthAction.standard_npm_synth(
-                source_artifact=source_artifact,
-                cloud_assembly_artifact=cloud_assembly_artifact,
-                install_command='npm install -g aws-cdk && pip3 install -r requirements.txt',
-                role_policy_statements=[
-                    iam.PolicyStatement(
-                        sid='InfrastructurePipelineParameterStorePolicy',
-                        effect=iam.Effect.ALLOW,
-                        actions=[
-                            'ssm:*',
-                        ],
-                        resources=[
-                            f'arn:aws:ssm:{self.region}:{self.account}:parameter/DataLake/*',
-                        ],
-                    ),
-                    iam.PolicyStatement(
-                        sid='InfrastructurePipelineSecretsManagerPolicy',
-                        effect=iam.Effect.ALLOW,
-                        actions=[
-                            'secretsmanager:*',
-                        ],
-                        resources=[
-                            f'arn:aws:secretsmanager:{self.region}:{self.account}:secret:/DataLake/*',
-                        ],
-                    ),
-                    iam.PolicyStatement(
-                        sid='InfrastructurePipelineKmsPolicy',
-                        effect=iam.Effect.ALLOW,
-                        actions=[
-                            'kms:*',
-                        ],
-                        resources=[
-                            '*',
-                        ],
-                    ),
-                    iam.PolicyStatement(
-                        sid='InfrastructurePipelineVpcPolicy',
-                        effect=iam.Effect.ALLOW,
-                        actions=[
-                            'vpc:*',
-                        ],
-                        resources=[
-                            '*',
-                        ],
-                    ),
-                    iam.PolicyStatement(
-                        sid='InfrastructurePipelineEc2Policy',
-                        effect=iam.Effect.ALLOW,
-                        actions=[
-                            'ec2:*',
-                        ],
-                        resources=[
-                            '*',
-                        ],
-                    ),
-                ],
-                synth_command='cdk synth --verbose',
-            ),
-            cross_account_keys=True,
-        )
+                                         pipeline_name=f'{target_environment.lower()}-{resource_name_prefix}-infrastructure-pipeline',
+                                         cloud_assembly_artifact=cloud_assembly_artifact,
+                                         source_action=codepipeline_actions.GitHubSourceAction(
+                                             action_name='GitHub',
+                                             branch=target_branch,
+                                             output=source_artifact,
+                                             oauth_token=cdk.SecretValue.secrets_manager(
+                                                 self.mappings[DEPLOYMENT][GITHUB_TOKEN]),
+                                             trigger=codepipeline_actions.GitHubTrigger.POLL,
+                                             owner=get_repository_owner(),
+                                             repo=get_repository_name(),
+                                         ),
+                                         synth_action=pipelines.SimpleSynthAction.standard_npm_synth(
+                                             source_artifact=source_artifact,
+                                             cloud_assembly_artifact=cloud_assembly_artifact,
+                                             install_command='npm install -g aws-cdk && pip3 install -r requirements.txt',
+                                             role_policy_statements=[
+                                                 iam.PolicyStatement(
+                                                     sid='InfrastructurePipelineParameterStorePolicy',
+                                                     effect=iam.Effect.ALLOW,
+                                                     actions=[
+                                                         'ssm:*',
+                                                     ],
+                                                     resources=[
+                                                         f'arn:aws:ssm:{self.region}:{self.account}:parameter/DataLake/*',
+                                                     ],
+                                                 ),
+                                                 iam.PolicyStatement(
+                                                     sid='InfrastructurePipelineSecretsManagerPolicy',
+                                                     effect=iam.Effect.ALLOW,
+                                                     actions=[
+                                                         'secretsmanager:*',
+                                                     ],
+                                                     resources=[
+                                                         f'arn:aws:secretsmanager:{self.region}:{self.account}:secret:/DataLake/*',
+                                                     ],
+                                                 ),
+                                                 iam.PolicyStatement(
+                                                     sid='InfrastructurePipelineKmsPolicy',
+                                                     effect=iam.Effect.ALLOW,
+                                                     actions=[
+                                                         'kms:*',
+                                                     ],
+                                                     resources=[
+                                                         '*',
+                                                     ],
+                                                 ),
+                                                 iam.PolicyStatement(
+                                                     sid='InfrastructurePipelineVpcPolicy',
+                                                     effect=iam.Effect.ALLOW,
+                                                     actions=[
+                                                         'vpc:*',
+                                                     ],
+                                                     resources=[
+                                                         '*',
+                                                     ],
+                                                 ),
+                                                 iam.PolicyStatement(
+                                                     sid='InfrastructurePipelineEc2Policy',
+                                                     effect=iam.Effect.ALLOW,
+                                                     actions=[
+                                                         'ec2:*',
+                                                     ],
+                                                     resources=[
+                                                         '*',
+                                                     ],
+                                                 ),
+                                             ],
+                                             synth_command='cdk synth --verbose',
+                                         ),
+                                         cross_account_keys=True,
+                                         )
 
         deploy_stage = PipelineDeployStage(self, target_environment,
-            target_environment=target_environment,
-            deployment_account_id=self.account,
-            env=target_aws_env,
-        )
+                                           target_environment=target_environment,
+                                           deployment_account_id=self.account,
+                                           env=target_aws_env,
+                                           )
         app_stage = pipeline.add_application_stage(deploy_stage)
         app_stage.add_actions(pipelines.ShellScriptAction(
             action_name='SyncParametersWithOutputsAction',
-            run_order=app_stage.next_sequential_run_order(), # run after deploy
+            run_order=app_stage.next_sequential_run_order(),  # run after deploy
             additional_artifacts=[source_artifact],
             commands=[
                 f"""
@@ -233,4 +231,4 @@ class PipelineStack(cdk.Stack):
                         f'arn:aws:ssm:{self.region}:{self.account}:parameter/DataLake/*',
                     ],
                 )]
-            ))
+        ))

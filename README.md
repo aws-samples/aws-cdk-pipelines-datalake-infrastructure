@@ -341,7 +341,7 @@ Before we deploy our resources we must provide the manual variables and upon dep
    export AWS_PROFILE=deployment_account_profile
    ```
 
-1. Go  to, [configure_account_parameters.py](./lib/prerequisites/configure_account_parameters.py) and fill in values of the `all_parameters` dict as desired
+1. Go  to, [configure_account_parameters.py](./lib/prerequisites/configure_account_parameters.py) and fill in values under `all_parameters` dictionary as desired
 
 1. run the below command to configure parameters for **dev** account
 
@@ -355,7 +355,7 @@ Before we deploy our resources we must provide the manual variables and upon dep
    ```{json}
       {
       "Deployment": {
-         "account_id": "763833843198",
+         "account_id": "deployment_account_id",
          "region": "us-east-2",
          "github_repository_owner_name": "aws-samples",
          "github_repository_name": "aws-cdk-pipelines-datalake-infrastructure",
@@ -363,26 +363,26 @@ Before we deploy our resources we must provide the manual variables and upon dep
          "resource_name_prefix": "cdkblog-test"
       },
       "Dev": {
-         "account_id": "431670122812",
+         "account_id": "dev_account_id",
          "region": "us-east-2",
          "vpc_cidr": "10.20.0.0/24"
       },
       "Test": {
-         "account_id": "278032850134",
+         "account_id": "test_account_id",
          "region": "us-east-1",
          "vpc_cidr": "10.10.0.0/24"
       },
       "Prod": {
-         "account_id": "927825637834",
+         "account_id": "prod_account_id",
          "region": "us-east-2",
          "vpc_cidr": "10.0.0.0/24"
       }
    }
 
-   To account: 763833843198? This should be Central Deployment Account Id
+   To account: deployment_account_id? This should be Central Deployment Account Id
    ```
 
-1. Expected output:
+1. Expected output 1: you will get an output similar to below
 
    ```bash
    Pushing Parameter: /DataLake/Deployment/AccountId
@@ -402,7 +402,7 @@ Before we deploy our resources we must provide the manual variables and upon dep
    Pushing Parameter: /DataLake/Prod/VpcCidr
    ```
 
-1. Expected output:
+1. Expected output 2: In deployment account, in AWS Systems Manager Parameter Store console, you will see parameters similar to below
 
    ![Alt](./resources/configured_ssm_parameters.png)
 
@@ -446,7 +446,7 @@ Configure your AWS profile to target the central Deployment account as an Admini
 1. Sample output:
 
    ```bash
-   cross-region-stack-763833843198:us-east-1
+   cross-region-stack-deployment_account_id:us-east-1
 
    DevCdkBlogInfrastructurePipeline
    ProdCdkBlogInfrastructurePipeline
@@ -466,10 +466,9 @@ Configure your AWS profile to target the central Deployment account as an Admini
    ```
 
 1. Run the command ```cdk deploy --all```
-1. Expected output:
-    1. It creates new Pipelines in CodePipeline in the Deployment account
-    1. It creates one or more CloudFormation Stacks in target AWS Account
-    1. In the target AWS account, all AWS resources constituted by the CloudFormation stack will be provisioned
+1. Expected output 1: In the deployment account's CloudFormation console, you will see the following CloudFormation stacks created
+
+   ![CloudFormation_stacks_in_deployment_account](./resources/cdk_deploy_output_deployment_account.png)
 
 ---
 

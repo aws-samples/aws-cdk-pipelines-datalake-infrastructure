@@ -16,8 +16,7 @@ fi
 
 if aws sts get-caller-identity > /dev/null; then
     export CDK_NEW_BOOTSTRAP=1
-    export IS_BOOTSTRAP=1
-    
+    export IS_BOOTSTRAP=1 
     read -r -p "Are you sure you want to bootstrap $(aws sts get-caller-identity) providing a trust relationship to: $1 using policy $2? (y/n) " response
     if [[ "$response" =~ ^([yY][eE][sS]|[yY])$ ]]; then
         cdk bootstrap --trust $1 --cloudformation-execution-policies $2 || (unset IS_BOOTSTRAP && unset CDK_NEW_BOOTSTRAP)

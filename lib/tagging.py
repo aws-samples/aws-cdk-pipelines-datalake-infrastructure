@@ -26,7 +26,6 @@ def tag(stack, target_environment: str):
 def get_tag(parameter_name, target_environment) -> dict:
     logical_id_prefix = get_logical_id_prefix()
     resource_name_prefix = get_resource_name_prefix()
-
     parameter_map = {
         COST_CENTER: [
             f'{resource_name_prefix}:cost-center',
@@ -45,8 +44,6 @@ def get_tag(parameter_name, target_environment) -> dict:
             f'{logical_id_prefix}Infrastructure',
         ],
     }
-
     if parameter_name not in parameter_map:
         raise AttributeError(f'Parameter map does not contain a key/value for {parameter_name}')
-
     return parameter_map[parameter_name]
