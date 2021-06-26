@@ -1,4 +1,23 @@
-# This code will be contributed by Isaiah Grant from 2nd Watch Inc.
-# He is one of the contributors of the blog this open source solution is referenced
-# His GitHub profile is https://github.com/igrant-2ndWatch
-# these lines will be removed once the code is added
+-e .
+aws-cdk.aws-cloudformation~=1.109.0
+aws-cdk.aws-cloudwatch~=1.109.0
+aws-cdk.aws-codebuild~=1.109.0
+aws-cdk.aws-codecommit~=1.109.0
+aws-cdk.aws-codedeploy~=1.109.0
+aws-cdk.aws-codeguruprofiler~=1.109.0
+aws-cdk.aws-codepipeline~=1.109.0
+aws-cdk.aws-codepipeline-actions~=1.109.0
+aws-cdk.aws-dynamodb~=1.109.0
+aws-cdk.aws-ec2~=1.109.0
+aws-cdk.aws-iam~=1.109.0
+aws-cdk.aws-kms~=1.109.0
+aws-cdk.aws-logs~=1.109.0
+aws-cdk.aws-s3~=1.109.0
+aws-cdk.aws-s3-assets~=1.109.0
+aws-cdk.aws-s3-deployment~=1.109.0
+aws-cdk.aws-s3-notifications~=1.109.0
+aws-cdk.aws-secretsmanager~=1.109.0
+aws-cdk.aws-ssm~=1.109.0
+aws-cdk.core~=1.109.0
+aws-cdk.pipelines~=1.109.0
+boto3~=1.17.97
