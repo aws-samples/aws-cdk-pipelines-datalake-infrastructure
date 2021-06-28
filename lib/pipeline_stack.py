@@ -102,7 +102,7 @@ class PipelineStack(cdk.Stack):
                                                      ],
                                                  ),
                                              ],
-                                             synth_command='cdk synth --verbose',
+                                             synth_command=f'export ENV={target_environment} && cdk synth --verbose',
                                          ),
                                          cross_account_keys=True,
                                          )
