@@ -470,6 +470,10 @@ Configure your AWS profile to target the central Deployment account as an Admini
 
    ![CloudFormation_stacks_in_deployment_account](./resources/cdk_deploy_output_deployment_account.png)
 
+1. Expected output 2: In the deployment account's CodePipeline console, you will see the following Pipeline triggered
+
+   ![CloudFormation_stacks_in_deployment_account](./resources/dev_codepipeline_in_deployment_account.png)
+
 ---
 
 ### Iterative Deployment
