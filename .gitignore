@@ -13,3 +13,5 @@ __pycache__
 # CDK asset staging directory
 .cdk.staging
 cdk.out
+.idea/
+cdk.context.json

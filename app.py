@@ -30,7 +30,6 @@ else:
         'account': deployment_account,
         'region': deployment_region,
     }
-    
     logical_id_prefix = get_logical_id_prefix()
     
     if os.environ.get('ENV', DEV) == DEV:
