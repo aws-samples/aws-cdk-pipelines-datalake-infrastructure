@@ -81,7 +81,7 @@ class S3BucketZonesStack(cdk.Stack):
                     'kms:GenerateDataKey*',
                     'kms:DescribeKey',
                 ],
-                resources=[s3_kms_key.key_arn],
+                resources=["*"],
             )
         )
 
@@ -128,7 +128,7 @@ class S3BucketZonesStack(cdk.Stack):
         )
         bucket.node.add_dependency(s3_kms_key)
         bucket.node.add_dependency(access_logs_bucket)
-        
+        bucket.node.add_dependency
         policy_document_statements = [
             iam.PolicyStatement(
                 sid='OnlyAllowSecureTransport',
