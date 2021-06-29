@@ -27,7 +27,8 @@ class S3BucketZonesStack(cdk.Stack):
 
         s3_kms_key = self.create_kms_key(
             deployment_account_id,
-            logical_id_prefix,
+            logical_id_prefix, 
+            resource_name_prefix,
         )
         access_logs_bucket = self.create_access_logs_bucket(
             f'{target_environment}{logical_id_prefix}AccessLogsBucket',
@@ -59,13 +60,14 @@ class S3BucketZonesStack(cdk.Stack):
         self.conformed_bucket = conformed_bucket
         self.purpose_built_bucket = purpose_built_bucket
 
-    def create_kms_key(self, deployment_account_id, logical_id_prefix) -> kms.Key:
+    def create_kms_key(self, deployment_account_id, logical_id_prefix, resource_name_prefix) -> kms.Key:
         s3_kms_key = kms.Key(
             self,
             f'{self.target_environment}{logical_id_prefix}KmsKey',
             admins=[iam.AccountPrincipal(self.account)],  # Gives account users admin access to the key
             description='Key used for encrypting Data Lake S3 Buckets',
-            removal_policy=self.removal_policy
+            removal_policy=self.removal_policy,
+            alias=f'{self.target_environment.lower()}-{resource_name_prefix}-kms-key'
         )
         # Gives account users and deployment account users access to use the key
         s3_kms_key.add_to_resource_policy(
@@ -128,7 +130,6 @@ class S3BucketZonesStack(cdk.Stack):
         )
         bucket.node.add_dependency(s3_kms_key)
         bucket.node.add_dependency(access_logs_bucket)
-        bucket.node.add_dependency
         policy_document_statements = [
             iam.PolicyStatement(
                 sid='OnlyAllowSecureTransport',
