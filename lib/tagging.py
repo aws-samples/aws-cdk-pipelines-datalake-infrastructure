@@ -46,4 +46,5 @@ def get_tag(parameter_name, target_environment) -> dict:
     }
     if parameter_name not in parameter_map:
         raise AttributeError(f'Parameter map does not contain a key/value for {parameter_name}')
+
     return parameter_map[parameter_name]

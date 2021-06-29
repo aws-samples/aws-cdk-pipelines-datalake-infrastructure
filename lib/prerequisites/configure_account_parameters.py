@@ -45,15 +45,16 @@ if __name__ == '__main__':
             if not bool(parameter_value):
                 raise Exception(f'You must provide a value for: {parameter_key}')
             elif parameter_key == RESOURCE_NAME_PREFIX and (
-                not re.fullmatch('^[a-z|0-9|-]+', parameter_value or '-' in parameter_value[-1:] or '-' in parameter_value[1]
-            )):
-                raise Exception(f'Resource names may only contain lowercase Alphanumeric and hyphens, but cannot '
-                                f'contain leading or trailing hyphens') 
+                not re.fullmatch('^[a-z|0-9|-]+', parameter_value)
+                or '-' in parameter_value[-1:] or '-' in parameter_value[1]
+            ):
+                raise Exception('Resource names may only contain lowercase Alphanumeric and hyphens '
+                                'and cannot contain leading or trailing hyphens')
 
     response = input((
         f'Are you sure you want to deploy:\n\n{json.dumps(all_parameters, indent=2)}\n\n'
         f'To account: {boto3.client("sts").get_caller_identity().get("Account")}? '
-        'This should be Central Deployment Account Id\n\n'
+        'This should be the Central Deployment Account Id\n\n'
         '(y/n)'
     ))
 

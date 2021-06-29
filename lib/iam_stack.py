@@ -17,24 +17,27 @@ class IamStack(Stack):
         logical_id_prefix = get_logical_id_prefix()
         resource_name_prefix = get_resource_name_prefix()
 
-        cross_account_dynamodb_role = Role(self,
-                                           f'{target_environment}{logical_id_prefix}CrossAccountDynamoDbRole',
-                                           description='Cross Account Role used for managing DynamoDb tables and their records.',
-                                           role_name=f'{target_environment.lower()}-{resource_name_prefix}-cross-account-dynamodb-role',
-                                           assumed_by=AccountPrincipal(deployment_account_id),
-                                           inline_policies=[PolicyDocument(
-                                               statements=[
-                                                   PolicyStatement(
-                                                       sid='DynamoDbPolicy',
-                                                       effect=Effect.ALLOW,
-                                                       actions=[
-                                                           'dynamodb:*',
-                                                       ],
-                                                       resources=[
-                                                           f'arn:aws:dynamodb:*:*:table/*',
-                                                       ],
-                                                   ),
-                                               ]
-                                           )]
-                                           )
+        cross_account_dynamodb_role = Role(
+            self,
+            f'{target_environment}{logical_id_prefix}CrossAccountDynamoDbRole',
+            description='Cross Account Role used for managing DynamoDb tables and their records.',
+            role_name=f'{target_environment.lower()}-{resource_name_prefix}-cross-account-dynamodb-role',
+            assumed_by=AccountPrincipal(deployment_account_id),
+            inline_policies=[PolicyDocument(
+                statements=[
+                    PolicyStatement(
+                        sid='DynamoDbPolicy',
+                        effect=Effect.ALLOW,
+                        actions=[
+                            'dynamodb:GetItem',
+                            'dynamodb:PutItem',
+                            'dynamodb:UpdateItem',
+                        ],
+                        resources=[
+                            'arn:aws:dynamodb:*:*:table/*',
+                        ],
+                    ),
+                ]
+            )]
+        )
         self.cross_account_dynamodb_role = cross_account_dynamodb_role
