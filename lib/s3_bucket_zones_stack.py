@@ -126,7 +126,9 @@ class S3BucketZonesStack(cdk.Stack):
             server_access_logs_bucket=access_logs_bucket,
             server_access_logs_prefix=bucket_name,
         )
-
+        bucket.node.add_dependency(s3_kms_key)
+        bucket.node.add_dependency(access_logs_bucket)
+        
         policy_document_statements = [
             iam.PolicyStatement(
                 sid='OnlyAllowSecureTransport',
@@ -160,7 +162,7 @@ class S3BucketZonesStack(cdk.Stack):
         return bucket
 
     def create_access_logs_bucket(self, logical_id, bucket_name, s3_kms_key) -> s3.Bucket:
-        return s3.Bucket(
+        bucket = s3.Bucket(
             self,
             id=logical_id,
             access_control=s3.BucketAccessControl.LOG_DELIVERY_WRITE,
@@ -174,3 +176,6 @@ class S3BucketZonesStack(cdk.Stack):
             versioned=True,
             object_ownership=s3.ObjectOwnership.BUCKET_OWNER_PREFERRED,
         )
+        bucket.node.add_dependency(s3_kms_key)
+        
+        return bucket
