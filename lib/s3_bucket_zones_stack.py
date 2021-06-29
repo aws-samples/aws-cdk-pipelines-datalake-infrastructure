@@ -139,7 +139,7 @@ class S3BucketZonesStack(cdk.Stack):
                     's3:PutObject',
                 ],
                 resources=[f'{bucket.bucket_arn}/*'],
-                conditions=[{'Bool': {'aws:SecureTransport': 'false'}}]
+                conditions={'Bool': {'aws:SecureTransport': 'false'}}
             )
         ]
         # Prevents user deletion of buckets
@@ -153,7 +153,7 @@ class S3BucketZonesStack(cdk.Stack):
                         's3:DeleteBucket',
                     ],
                     resources=[bucket.bucket_arn],
-                    conditions=[{'StringLike': {'aws:userId': f'arn:aws:iam::{self.account}:user/*'}}]
+                    conditions={'StringLike': {'aws:userId': f'arn:aws:iam::{self.account}:user/*'}}
                 )
             )
         for statement in policy_document_statements:
