@@ -13,14 +13,16 @@ from .configuration import (
 
 
 class S3BucketZonesStack(cdk.Stack):
+
     def __init__(self, scope: cdk.Construct, construct_id: str, target_environment: str, deployment_account_id: str,
                  **kwargs) -> None:
         super().__init__(scope, construct_id, **kwargs)
         self.target_environment = target_environment
         logical_id_prefix = get_logical_id_prefix()
         resource_name_prefix = get_resource_name_prefix()
-        self.removal_policy = cdk.RemovalPolicy.RETAIN if (target_environment == PROD
-                                                           or target_environment == TEST) else cdk.RemovalPolicy.DESTROY
+        self.removal_policy = cdk.RemovalPolicy.DESTROY
+        if (target_environment == PROD or target_environment == TEST):
+            self.removal_policy = cdk.RemovalPolicy.RETAIN
         s3_kms_key = self.create_kms_key(
             deployment_account_id,
             logical_id_prefix,
@@ -56,10 +58,13 @@ class S3BucketZonesStack(cdk.Stack):
         self.purpose_built_bucket = purpose_built_bucket
 
     def create_kms_key(self, deployment_account_id, logical_id_prefix,) -> kms.Key:
-        s3_kms_key = kms.Key(self, f'{self.target_environment}{logical_id_prefix}KmsKey',
-                             admins=[iam.AccountPrincipal(self.account)],  # Gives account users admin access to the key
-                             description='Key used for encrypting Data Lake S3 Buckets',
-                             removal_policy=self.removal_policy,)
+        s3_kms_key = kms.Key(
+            self,
+            f'{self.target_environment}{logical_id_prefix}KmsKey',
+            admins=[iam.AccountPrincipal(self.account)],  # Gives account users admin access to the key
+            description='Key used for encrypting Data Lake S3 Buckets',
+            removal_policy=self.removal_policy
+        )
         # Gives account users and deployment account users access to use the key
         s3_kms_key.add_to_resource_policy(
             iam.PolicyStatement(
@@ -149,6 +154,7 @@ class S3BucketZonesStack(cdk.Stack):
             )
         for statement in policy_document_statements:
             bucket.add_to_resource_policy(statement)
+
         return bucket
 
     def create_access_logs_bucket(self, logical_id, bucket_name, s3_kms_key) -> s3.Bucket:
@@ -166,4 +172,5 @@ class S3BucketZonesStack(cdk.Stack):
             versioned=True,
             object_ownership=s3.ObjectOwnership.BUCKET_OWNER_PREFERRED,
         )
+
         return bucket

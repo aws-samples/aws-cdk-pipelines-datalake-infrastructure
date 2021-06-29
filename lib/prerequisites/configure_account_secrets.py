@@ -24,7 +24,7 @@ if __name__ == '__main__':
     response = input((
         f'Are you sure you want to add the secrets to AWS Secrets Manager '
         f'to account: {boto3.client("sts").get_caller_identity().get("Account")}?\n\n'
-        'This should be Central Deployment Account Id\n\n'
+        'This should be the Central Deployment Account Id\n\n'
         '(y/n)'
     ))
 
