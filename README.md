@@ -217,7 +217,59 @@ Environment bootstrap is standard CDK process to prepare an AWS environment read
 
     **Important**: Your configured environment *must* first target the centralized deployment account
 
-    ```{bash}
+ 1. Set environment variable. Run the below command
+
+    ```bash
+    export AWS_PROFILE=deployment_account_profile
+    ```
+
+ 1. Create a Python virtual environment, activate it, and install all dependencies
+
+    ```bash
+    python3 -m venv .venv
+    source .venv/bin/activate
+    ```
+
+ 1. Expected output: this creates **.venv** folder with contents shown below
+
+    ```bash
+    (.venv) 8c85906ee187:aws-cdk-pipelines-datalake-infrastructure
+
+    user_id$ ls -lart .venv/
+
+    total 8
+    drwxr-xr-x   2 user_id  staff   64 Jun 23 15:25 include
+    drwxr-xr-x   3 user_id  staff   96 Jun 23 15:25 lib
+    drwxr-xr-x   6 user_id  staff  192 Jun 23 15:25 .
+    -rw-r--r--   1 user_id  staff  114 Jun 23 15:25 pyvenv.cfg
+    drwxr-xr-x  16 user_id  staff  512 Jun 23 15:27 bin
+    drwxr-xr-x  21 user_id  staff  672 Jun 23 15:28 ..
+    ```
+
+ 1. Install dependencies. Run the below command
+
+    ```bash
+    pip install -r requirements.txt
+    ```
+
+ 1. Expected output: run the below command and verify you will see all dependencies instaled.
+
+    ```bash
+    ls -lart .venv/lib/python3.9/site-packages/
+    ```
+
+ 1. Enable execute permissions for scripts.
+
+    ```bash
+    chmod 700 ./lib/prerequisites/bootstrap_deployment_account.sh
+    chmod 700 ./lib/prerequisites/bootstrap_target_account.sh
+    chmod 700 ./lib/prerequisites/configure_account_parameters.sh
+    chmod 700 ./lib/prerequisites/configure_account_secrets.sh
+    ```
+
+ 1. Bootstrap central deployment account. Run the below command:
+
+    ```bash
     ./lib/prerequisites/bootstrap_deployment_account.sh
     ```
 
@@ -262,6 +314,26 @@ Environment bootstrap is standard CDK process to prepare an AWS environment read
      "Arn": "arn:aws:iam::dev_account_id:user/user_id"
     } providing a trust relationship to: deployment_account_id using policy arn:aws:iam::aws:policy/AdministratorAccess? (y/n)
     ```
+  
+ 1. When you see the following text, enter **y**, and press enter/return
+
+    ```bash
+    Are you sure you want to bootstrap {
+     "UserId": "user_id",
+     "Account": "dev_account_id",
+     "Arn": "arn:aws:iam::dev_account_id:user/user_id"
+    } providing a trust relationship to: deployment_account_id using policy arn:aws:iam::aws:policy/AdministratorAccess? (y/n)
+    ```
+
+ 1. **Important:** Your configured environment *must* target the appropriate account for **each** account
+
+ 1. Expected output 1:
+
+    ✅  Environment aws://dev_account_id/us-east-2 bootstrapped.
+
+ 1. Expected output 2: you will see a stack created in your deployment account as follows
+
+    ![bootstrap_central_deployment_account](./resources/bootstrap_central_deployment_account_exp_output.png)
 
     Expected output 1:
 
@@ -425,7 +497,7 @@ Integration between AWS CodePipeline and GitHub requires a personal access token
 
 1. Create a [personal access token](https://docs.github.com/en/github/authenticating-to-github/keeping-your-account-and-data-secure/creating-a-personal-access-token)
 
-1. Go to, [configure_account_secrets.py](./lib/prerequisites/configure_account_secrets.py) and fill in the value for attribute **GITHUB_TOKEN** in `all_secrets` dictionary
+1. Go to [configure_account_secrets.py](./lib/prerequisites/configure_account_secrets.py) and fill in the value for attribute **GITHUB_TOKEN** in `all_secrets` dictionary
 
 1. Run the below command
 
@@ -476,9 +548,13 @@ Configure your AWS profile to target the central Deployment account as an Admini
     ```
 
 1. Run the command ```cdk deploy --all```
-1. Expected output 1: In the deployment account's CloudFormation console, you will see the following CloudFormation stacks created
+    Expected output 1: In the deployment account's CloudFormation console, you will see the following CloudFormation stacks created
 
    ![CloudFormation_stacks_in_deployment_account](./resources/cdk_deploy_output_deployment_account.png)
+
+    Expected output 2: In the deployment account's CodePipeline console, you will see the following Pipeline triggered
+
+   ![CloudFormation_stacks_in_deployment_account](./resources/dev_codepipeline_in_deployment_account.png)
 
 ---
 

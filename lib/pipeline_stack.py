@@ -76,6 +76,16 @@ class PipelineStack(cdk.Stack):
                         ],
                     ),
                     iam.PolicyStatement(
+                        sid='InfrastructurePipelineSTSAssumeRolePolicy',
+                        effect=iam.Effect.ALLOW,
+                        actions=[
+                            'sts:AssumeRole',
+                        ],
+                        resources=[
+                            '*',
+                        ],
+                    ),
+                    iam.PolicyStatement(
                         sid='InfrastructurePipelineKmsPolicy',
                         effect=iam.Effect.ALLOW,
                         actions=[
@@ -106,7 +116,7 @@ class PipelineStack(cdk.Stack):
                         ],
                     ),
                 ],
-                synth_command='cdk synth --verbose',
+                synth_command=f'export ENV={target_environment} && cdk synth --verbose',
             ),
             cross_account_keys=True,
         )

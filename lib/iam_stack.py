@@ -29,7 +29,9 @@ class IamStack(Stack):
                         sid='DynamoDbPolicy',
                         effect=Effect.ALLOW,
                         actions=[
-                            'dynamodb:*',
+                            'dynamodb:GetItem',
+                            'dynamodb:PutItem',
+                            'dynamodb:UpdateItem',
                         ],
                         resources=[
                             'arn:aws:dynamodb:*:*:table/*',

@@ -13,7 +13,6 @@ from .configuration import (
 
 
 class S3BucketZonesStack(cdk.Stack):
-
     def __init__(self, scope: cdk.Construct, construct_id: str, target_environment: str, deployment_account_id: str,
                  **kwargs) -> None:
         super().__init__(scope, construct_id, **kwargs)
