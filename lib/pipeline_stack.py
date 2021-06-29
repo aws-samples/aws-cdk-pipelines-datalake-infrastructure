@@ -22,6 +22,7 @@ class PipelineStack(cdk.Stack):
         self, scope: cdk.Construct, id: str, target_environment: str, target_branch: str, target_aws_env: dict, **kwargs
     ) -> None:
         super().__init__(scope, id, **kwargs)
+
         self.mappings = get_path_mappings()
         self.create_environment_pipeline(
             target_environment,

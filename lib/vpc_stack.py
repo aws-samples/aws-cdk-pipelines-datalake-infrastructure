@@ -10,6 +10,7 @@ class VpcStack(cdk.Stack):
 
     def __init__(self, scope: cdk.Construct, construct_id: str, target_environment: str, **kwargs) -> None:
         super().__init__(scope, construct_id, **kwargs)
+
         mappings = get_path_mapping(target_environment)
         vpc_cidr = get_ssm_parameter(mappings[VPC_CIDR])
         logical_id_prefix = get_logical_id_prefix()
