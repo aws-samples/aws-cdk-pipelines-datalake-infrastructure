@@ -1,4 +1,4 @@
-# Copyright 2020 Amazon.com, Inc. or its affiliates. All Rights Reserved.
+# Copyright 2021 Amazon.com, Inc. or its affiliates. All Rights Reserved.
 # SPDX-License-Identifier: MIT-0
 
 from aws_cdk.core import Construct, Stack
@@ -11,6 +11,14 @@ from .configuration import (
 class IamStack(Stack):
     def __init__(self, scope: Construct, construct_id: str, target_environment: str, deployment_account_id: str,
                  **kwargs) -> None:
+        """
+        Creates a CloudFormation stack for AWS IAM resources. It includes an IAM role with DynamoDB permissions.
+        @param scope: 
+        @param construct_id: 
+        @param target_environment: 
+        @param deployment_account_id: 
+        @param kwargs: 
+        """
         super().__init__(scope, construct_id, **kwargs)
 
         self.mappings = get_path_mapping(target_environment)

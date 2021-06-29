@@ -1,5 +1,6 @@
-rem Copyright 2020 Amazon.com, Inc. or its affiliates. All Rights Reserved.
+rem Copyright 2021 Amazon.com, Inc. or its affiliates. All Rights Reserved.
 rem SPDX-License-Identifier: MIT-0
+
 @echo off
 
 rem The sole purpose of this script is to make the command

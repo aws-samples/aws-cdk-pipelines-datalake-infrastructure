@@ -1,4 +1,4 @@
-# Copyright 2020 Amazon.com, Inc. or its affiliates. All Rights Reserved.
+# Copyright 2021 Amazon.com, Inc. or its affiliates. All Rights Reserved.
 # SPDX-License-Identifier: MIT-0
 
 import aws_cdk.core as cdk
@@ -11,6 +11,14 @@ from .configuration import get_logical_id_prefix
 
 class PipelineDeployStage(cdk.Stage):
     def __init__(self, scope: cdk.Construct, id: str, target_environment: str, deployment_account_id: str, **kwargs):
+        """
+        Adds deploy stage to CodePipeline
+        @param scope: 
+        @param id: 
+        @param target_environment: 
+        @param deployment_account_id: 
+        @param kwargs: 
+        """
         super().__init__(scope, id, **kwargs)
 
         logical_id_prefix = get_logical_id_prefix()

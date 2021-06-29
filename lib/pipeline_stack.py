@@ -1,4 +1,4 @@
-# Copyright 2020 Amazon.com, Inc. or its affiliates. All Rights Reserved.
+# Copyright 2021 Amazon.com, Inc. or its affiliates. All Rights Reserved.
 # SPDX-License-Identifier: MIT-0
 
 import aws_cdk.core as cdk
@@ -31,6 +31,13 @@ class PipelineStack(cdk.Stack):
         )
 
     def create_environment_pipeline(self, target_environment, target_branch, target_aws_env):
+        """
+        TODO: Isaiah to add
+        @param target_environment: 
+        @param target_branch: 
+        @param target_aws_env: 
+        @return: 
+        """
         source_artifact = codepipeline.Artifact()
         cloud_assembly_artifact = codepipeline.Artifact()
         logical_id_prefix = get_logical_id_prefix()

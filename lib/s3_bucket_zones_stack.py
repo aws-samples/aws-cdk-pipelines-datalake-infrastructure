@@ -1,4 +1,4 @@
-# Copyright 2020 Amazon.com, Inc. or its affiliates. All Rights Reserved.
+# Copyright 2021 Amazon.com, Inc. or its affiliates. All Rights Reserved.
 # SPDX-License-Identifier: MIT-0
 
 import aws_cdk.aws_iam as iam
@@ -16,6 +16,15 @@ class S3BucketZonesStack(cdk.Stack):
     def __init__(
         self, scope: cdk.Construct, construct_id: str, target_environment: str, deployment_account_id: str, **kwargs
     ) -> None:
+        """
+        CloudFormation stack to create AWS KMS Key, Amazon S3 resources such as buckets and bucket policies.
+        @param scope: 
+        @param construct_id: 
+        @param target_environment: 
+        @param deployment_account_id: 
+        @param kwargs: 
+        """
+        
         super().__init__(scope, construct_id, **kwargs)
 
         self.target_environment = target_environment
@@ -61,6 +70,13 @@ class S3BucketZonesStack(cdk.Stack):
         self.purpose_built_bucket = purpose_built_bucket
 
     def create_kms_key(self, deployment_account_id, logical_id_prefix, resource_name_prefix) -> kms.Key:
+        """
+        Creates an AWS KMS Key and attaches a Key policy
+        @param deployment_account_id: 
+        @param logical_id_prefix: 
+        @param resource_name_prefix: 
+        @return: 
+        """
         s3_kms_key = kms.Key(
             self,
             f'{self.target_environment}{logical_id_prefix}KmsKey',
@@ -90,6 +106,15 @@ class S3BucketZonesStack(cdk.Stack):
         return s3_kms_key
 
     def create_data_lake_zone_bucket(self, logical_id, bucket_name, access_logs_bucket, s3_kms_key) -> s3.Bucket:
+        """
+        Creates an Amazon S3 bucket and attaches bucket policy with necessary guardrails.
+        It enables server-side encryption using provided KMS key and leverage S3 bucket key feature.
+        @param logical_id: 
+        @param bucket_name: 
+        @param access_logs_bucket: 
+        @param s3_kms_key: 
+        @return: 
+        """
         lifecycle_rules = [
             s3.LifecycleRule(
                 enabled=True,
@@ -163,6 +188,14 @@ class S3BucketZonesStack(cdk.Stack):
         return bucket
 
     def create_access_logs_bucket(self, logical_id, bucket_name, s3_kms_key) -> s3.Bucket:
+        """
+        Creates an Amazon S3 bucket to store S3 server access logs. It attaches bucket policy with necessary guardrails.
+        It enables server-side encryption using provided KMS key and leverage S3 bucket key feature.
+        @param logical_id: 
+        @param bucket_name: 
+        @param s3_kms_key: 
+        @return: 
+        """
         bucket = s3.Bucket(
             self,
             id=logical_id,
