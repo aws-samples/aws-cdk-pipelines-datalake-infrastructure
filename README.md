@@ -158,7 +158,7 @@ This section has various steps you need to perform before you deploy data lake r
 
 Environment bootstrap is standard CDK process to prepare an AWS environment ready for deployment. Follow the steps:
 
- 1. Go to root directory of this project. You can find the [CDK app.py](app.py) file exists
+ 1. Go to project root directory where [app.py](app.py) file exists
 
  1. Create Python virtual environment. This is a one-time activity.
 
@@ -398,7 +398,7 @@ Integration between AWS CodePipeline and GitHub requires a personal access token
 1. Expected output 1:
 
     ```{bash}
-    Pushing Secret: /DataLake/GitHubToken
+    Pushing secret: /DataLake/GitHubToken
     ```
 
 1. Expected output 2: A secret is added to AWS Secrets Manager with name **/DataLake/GitHubToken**
@@ -434,7 +434,7 @@ Configure your AWS profile to target the central Deployment account as an Admini
     **Note:**
      1. Here, **DataLakeCDKBlog** string literal is the value of ```LOGICAL_ID_PREFIX``` configured in [configuration.py](./lib/configuration.py)
 
-1. Setup AWS Configuration for central deployment account.
+1. Set your environment variable back to deployment account
 
     ```{bash}
     export AWS_PROFILE=deployment_account_profile_name_here
