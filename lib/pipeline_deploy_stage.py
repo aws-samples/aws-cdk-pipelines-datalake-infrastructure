@@ -29,26 +29,26 @@ class PipelineDeployStage(cdk.Stage):
 
         logical_id_prefix = get_logical_id_prefix()
 
-        self.vpc_stack = VpcStack(
+        vpc_stack = VpcStack(
             self,
             f'{target_environment}{logical_id_prefix}InfrastructureVpc',
             target_environment=target_environment,
             **kwargs,
         )
-        self.bucket_stack = S3BucketZonesStack(
+        bucket_stack = S3BucketZonesStack(
             self,
             f'{target_environment}{logical_id_prefix}InfrastructureS3BucketZones',
             target_environment=target_environment,
             deployment_account_id=deployment_account_id,
             **kwargs,
         )
-        self.iam_stack = IamStack(
+        iam_stack = IamStack(
             self,
             f'{target_environment}{logical_id_prefix}InfrastructureIam',
             target_environment=target_environment,
             deployment_account_id=deployment_account_id,
         )
 
-        tag(self.vpc_stack, target_environment)
-        tag(self.bucket_stack, target_environment)
-        tag(self.iam_stack, target_environment)
+        tag(vpc_stack, target_environment)
+        tag(bucket_stack, target_environment)
+        tag(iam_stack, target_environment)
