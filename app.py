@@ -21,9 +21,6 @@ if bool(os.environ.get('IS_BOOTSTRAP')):
 else:
     raw_mappings = get_all_configurations()
 
-    # NOTE: Boto3 is required due to CDK design where the environment parameter
-    #       must be a static (non-contextual) value.
-    #       Reference: https://github.com/aws/aws-cdk/issues/4096
     deployment_account = raw_mappings[DEPLOYMENT][ACCOUNT_ID]
     deployment_region = raw_mappings[DEPLOYMENT][REGION]
     deployment_aws_env = {
