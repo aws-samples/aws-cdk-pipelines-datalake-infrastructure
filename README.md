@@ -539,6 +539,8 @@ Refer to [cdk_instructions.md](./resources/cdk_instructions.md) for detailed ins
 
 Refer to [developer_instructions.md](./resources/developer_instructions.md) for notes to Developers on this project
 
+---
+
 ## Contributors
 
 1. **Isaiah Grant**, Cloud Consultant, 2nd Watch, Inc.
