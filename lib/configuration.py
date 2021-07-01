@@ -55,8 +55,13 @@ def get_local_configuration(environment: str) -> dict:
             REGION: 'us-east-2',
             GITHUB_REPOSITORY_OWNER_NAME: '',
             GITHUB_REPOSITORY_NAME: '',
+            # This is used in the Logical Id of CloudFormation resources.
+            #   We recommend Capital case for consistency.
+            # Example: DataLakeCdkBlog
             LOGICAL_ID_PREFIX: '',
-            # Important: Resource names may only contain Alphanumeric and hyphens and cannot contain trailing hyphens
+            # Important: This is used in resources that must be **globally** unique!
+            #   Resource names may only contain Alphanumeric and hyphens and cannot contain trailing hyphens.
+            # Example: unique-identifier-data-lake
             RESOURCE_NAME_PREFIX: '',
         },
         DEV: {

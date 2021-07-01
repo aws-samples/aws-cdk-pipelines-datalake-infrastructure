@@ -427,8 +427,14 @@ Before we deploy our resources we must provide the manual variables and upon dep
             REGION: 'us-east-2',
             GITHUB_REPOSITORY_OWNER_NAME: 'aws-samples', # Note: Use your owner here!
             GITHUB_REPOSITORY_NAME: 'aws-cdk-pipelines-datalake-infrastructure', # Note: Use your forked repo here!
+            # This is used in the Logical Id of CloudFormation resources.
+            #   We recommend Capital case for consistency.
+            # Example: DataLakeCdkBlog
             LOGICAL_ID_PREFIX: 'DataLake',
-            RESOURCE_NAME_PREFIX: 'business-name-data-lake', # Important: This is used in resources that must be **globally** unique!
+            # Important: This is used in resources that must be **globally** unique!
+            #   Resource names may only contain Alphanumeric and hyphens and cannot contain trailing hyphens.
+            # Example: unique-identifier-data-lake
+            RESOURCE_NAME_PREFIX: 'business-name-data-lake',
         },
         DEV: {
             ACCOUNT_ID: 'dev_account_id',
