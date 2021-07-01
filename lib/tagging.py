@@ -17,23 +17,22 @@ APPLICATION = 'APPLICATION'
 def tag(stack, target_environment: str):
     """
     Adds a tag to all constructs in the stack
-    @param stack: 
-    @param target_environment: 
-    @return: 
+
+    @param stack: The stack to tag
+    @param target_environment: The environment the stack is deployed to
     """
-    
     cdk.Tags.of(stack).add(*get_tag(COST_CENTER, target_environment))
     cdk.Tags.of(stack).add(*get_tag(TAG_ENVIRONMENT, target_environment))
     cdk.Tags.of(stack).add(*get_tag(TEAM, target_environment))
     cdk.Tags.of(stack).add(*get_tag(APPLICATION, target_environment))
 
 
-def get_tag(parameter_name, target_environment) -> dict:
+def get_tag(tag_name, target_environment) -> dict:
     """
     Get a tag for a given parameter and target environment.
-    @param parameter_name: 
-    @param target_environment: 
-    @return: 
+
+    @param tag_name: The name of the tag
+    @param target_environment: The environment the tag is applied to
     """
     logical_id_prefix = get_logical_id_prefix()
     resource_name_prefix = get_resource_name_prefix()
@@ -55,7 +54,7 @@ def get_tag(parameter_name, target_environment) -> dict:
             f'{logical_id_prefix}Infrastructure',
         ],
     }
-    if parameter_name not in parameter_map:
-        raise AttributeError(f'Parameter map does not contain a key/value for {parameter_name}')
+    if tag_name not in parameter_map:
+        raise AttributeError(f'Parameter map does not contain a key/value for {tag_name}')
 
-    return parameter_map[parameter_name]
+    return parameter_map[tag_name]

@@ -1,33 +1,38 @@
 # Copyright 2021 Amazon.com, Inc. or its affiliates. All Rights Reserved.
 # SPDX-License-Identifier: MIT-0
 
-import aws_cdk.aws_iam as iam
 import aws_cdk.core as cdk
+import aws_cdk.aws_iam as iam
 import aws_cdk.aws_kms as kms
 import aws_cdk.aws_s3 as s3
 
 from .configuration import (
-    PROD, TEST, get_logical_id_prefix,
-    get_resource_name_prefix,
+    PROD, S3_ACCESS_LOG_BUCKET, S3_CONFORMED_BUCKET, S3_KMS_KEY, S3_PURPOSE_BUILT_BUCKET, S3_RAW_BUCKET, TEST,
+    get_environment_configuration, get_logical_id_prefix, get_resource_name_prefix,
 )
 
 
 class S3BucketZonesStack(cdk.Stack):
     def __init__(
-        self, scope: cdk.Construct, construct_id: str, target_environment: str, deployment_account_id: str, **kwargs
+        self, scope: cdk.Construct, construct_id: str,
+        target_environment: str, deployment_account_id: str,
+        **kwargs
     ) -> None:
         """
         CloudFormation stack to create AWS KMS Key, Amazon S3 resources such as buckets and bucket policies.
-        @param scope: 
-        @param construct_id: 
-        @param target_environment: 
-        @param deployment_account_id: 
-        @param kwargs: 
+
+        @param scope cdk.Construct: Parent of this stack, usually an App or a Stage, but could be any construct.:
+        @param construct_id str:
+            The construct ID of this stack. If stackName is not explicitly defined,
+            this id (and any parent IDs) will be used to determine the physical ID of the stack.
+        @param target_environment str: The target environment for stacks in the deploy stage
+        @param deployment_account_id: The id for the deployment account
+        @param kwargs:
         """
-        
         super().__init__(scope, construct_id, **kwargs)
 
         self.target_environment = target_environment
+        mappings = get_environment_configuration(target_environment)
         logical_id_prefix = get_logical_id_prefix()
         resource_name_prefix = get_resource_name_prefix()
         self.removal_policy = cdk.RemovalPolicy.DESTROY
@@ -36,7 +41,7 @@ class S3BucketZonesStack(cdk.Stack):
 
         s3_kms_key = self.create_kms_key(
             deployment_account_id,
-            logical_id_prefix, 
+            logical_id_prefix,
             resource_name_prefix,
         )
         access_logs_bucket = self.create_access_logs_bucket(
@@ -62,20 +67,46 @@ class S3BucketZonesStack(cdk.Stack):
             access_logs_bucket,
             s3_kms_key,
         )
-        # Assign resources for export to SSM Parameter Store
-        self.s3_kms_key = s3_kms_key
-        self.access_logs_bucket = access_logs_bucket
-        self.raw_bucket = raw_bucket
-        self.conformed_bucket = conformed_bucket
-        self.purpose_built_bucket = purpose_built_bucket
+
+        # Stack Outputs that are programmatically synchronized
+        cdk.CfnOutput(
+            self,
+            f'{target_environment}{logical_id_prefix}KmsKeyArn',
+            value=s3_kms_key.key_arn,
+            export_name=mappings[S3_KMS_KEY]
+        )
+        cdk.CfnOutput(
+            self,
+            f'{target_environment}{logical_id_prefix}AccessLogsBucketName',
+            value=access_logs_bucket.bucket_name,
+            export_name=mappings[S3_ACCESS_LOG_BUCKET]
+        )
+        cdk.CfnOutput(
+            self,
+            f'{target_environment}{logical_id_prefix}RawBucketName',
+            value=raw_bucket.bucket_name,
+            export_name=mappings[S3_RAW_BUCKET]
+        )
+        cdk.CfnOutput(
+            self,
+            f'{target_environment}{logical_id_prefix}ConformedBucketName',
+            value=conformed_bucket.bucket_name,
+            export_name=mappings[S3_CONFORMED_BUCKET]
+        )
+        cdk.CfnOutput(
+            self,
+            f'{target_environment}{logical_id_prefix}PurposeBuiltBucketName',
+            value=purpose_built_bucket.bucket_name,
+            export_name=mappings[S3_PURPOSE_BUILT_BUCKET]
+        )
 
     def create_kms_key(self, deployment_account_id, logical_id_prefix, resource_name_prefix) -> kms.Key:
         """
         Creates an AWS KMS Key and attaches a Key policy
-        @param deployment_account_id: 
-        @param logical_id_prefix: 
-        @param resource_name_prefix: 
-        @return: 
+
+        @param deployment_account_id: The id for the deployment account
+        @param logical_id_prefix:
+        @param resource_name_prefix:
         """
         s3_kms_key = kms.Key(
             self,
@@ -109,11 +140,13 @@ class S3BucketZonesStack(cdk.Stack):
         """
         Creates an Amazon S3 bucket and attaches bucket policy with necessary guardrails.
         It enables server-side encryption using provided KMS key and leverage S3 bucket key feature.
-        @param logical_id: 
-        @param bucket_name: 
-        @param access_logs_bucket: 
-        @param s3_kms_key: 
-        @return: 
+
+        @param logical_id str: The logical id prefix to apply to all CloudFormation resources
+        @param bucket_name str: The name for the bucket resource
+        @param access_logs_bucket s3.Bucket: The bucket to target for Access Logging
+        @param s3_kms_key kms.Key: The KMS Key to use for encryption of data at rest
+
+        @return: s3.Bucket: The bucket that was created
         """
         lifecycle_rules = [
             s3.LifecycleRule(
@@ -153,8 +186,6 @@ class S3BucketZonesStack(cdk.Stack):
             server_access_logs_bucket=access_logs_bucket,
             server_access_logs_prefix=bucket_name,
         )
-        bucket.node.add_dependency(s3_kms_key)
-        bucket.node.add_dependency(access_logs_bucket)
         policy_document_statements = [
             iam.PolicyStatement(
                 sid='OnlyAllowSecureTransport',
@@ -191,12 +222,14 @@ class S3BucketZonesStack(cdk.Stack):
         """
         Creates an Amazon S3 bucket to store S3 server access logs. It attaches bucket policy with necessary guardrails.
         It enables server-side encryption using provided KMS key and leverage S3 bucket key feature.
-        @param logical_id: 
-        @param bucket_name: 
-        @param s3_kms_key: 
-        @return: 
+
+        @param logical_id str: The logical id prefix to apply to all CloudFormation resources
+        @param bucket_name str: The name for the bucket resource
+        @param s3_kms_key kms.Key: The KMS Key to use for encryption of data at rest
+
+        @return: The bucket that was created
         """
-        bucket = s3.Bucket(
+        return s3.Bucket(
             self,
             id=logical_id,
             access_control=s3.BucketAccessControl.LOG_DELIVERY_WRITE,
@@ -210,6 +243,3 @@ class S3BucketZonesStack(cdk.Stack):
             versioned=True,
             object_ownership=s3.ObjectOwnership.BUCKET_OWNER_PREFERRED,
         )
-        bucket.node.add_dependency(s3_kms_key)
-        
-        return bucket

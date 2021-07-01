@@ -1,27 +1,33 @@
 # Copyright 2021 Amazon.com, Inc. or its affiliates. All Rights Reserved.
 # SPDX-License-Identifier: MIT-0
 
-from aws_cdk.core import Construct, Stack
+import aws_cdk.core as cdk
 from aws_cdk.aws_iam import AccountPrincipal, Effect, PolicyDocument, PolicyStatement, Role
 from .configuration import (
-    get_path_mapping, get_logical_id_prefix, get_resource_name_prefix
+    CROSS_ACCOUNT_DYNAMODB_ROLE, get_path_mapping, get_logical_id_prefix, get_resource_name_prefix
 )
 
 
-class IamStack(Stack):
-    def __init__(self, scope: Construct, construct_id: str, target_environment: str, deployment_account_id: str,
-                 **kwargs) -> None:
+class IamStack(cdk.Stack):
+    def __init__(
+        self, scope: cdk.Construct, construct_id: str,
+        target_environment: str, deployment_account_id: str,
+        **kwargs
+    ) -> None:
         """
         Creates a CloudFormation stack for AWS IAM resources. It includes an IAM role with DynamoDB permissions.
-        @param scope: 
-        @param construct_id: 
-        @param target_environment: 
-        @param deployment_account_id: 
-        @param kwargs: 
+
+        @param scope cdk.Construct: Parent of this stack, usually an App or a Stage, but could be any construct.:
+        @param construct_id str:
+            The construct ID of this stack. If stackName is not explicitly defined,
+            this id (and any parent IDs) will be used to determine the physical ID of the stack.
+        @param target_environment str: The target environment for stacks in the deploy stage
+        @param deployment_account_id:
+        @param kwargs:
         """
         super().__init__(scope, construct_id, **kwargs)
 
-        self.mappings = get_path_mapping(target_environment)
+        mappings = get_path_mapping(target_environment)
         logical_id_prefix = get_logical_id_prefix()
         resource_name_prefix = get_resource_name_prefix()
 
@@ -48,4 +54,11 @@ class IamStack(Stack):
                 ]
             )]
         )
-        self.cross_account_dynamodb_role = cross_account_dynamodb_role
+
+        # Stack Outputs that are programmatically synchronized
+        cdk.CfnOutput(
+            self,
+            f'{target_environment}{logical_id_prefix}CrossAccountDynamoDbRoleArn',
+            value=cross_account_dynamodb_role.role_arn,
+            export_name=mappings[CROSS_ACCOUNT_DYNAMODB_ROLE]
+        )
