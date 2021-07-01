@@ -151,6 +151,8 @@ This section has various steps you need to perform before you deploy data lake r
 
 1. **Python** - make sure you have Python SDK installed on your system. We recommend Python 3.7 and above.
 
+1. **Github Fork** - we recommend you [fork the repository](https://docs.github.com/en/get-started/quickstart/fork-a-repo) so you are in control of deployed resources.
+
 ---
 
 ### AWS environment bootstrapping
@@ -219,20 +221,20 @@ Environment bootstrap is standard CDK process to prepare an AWS environment read
 
  1. Set environment variable. Run the below command
 
-    ```bash
+    ```{bash}
     export AWS_PROFILE=deployment_account_profile
     ```
 
  1. Create a Python virtual environment, activate it, and install all dependencies
 
-    ```bash
+    ```{bash}
     python3 -m venv .venv
     source .venv/bin/activate
     ```
 
  1. Expected output: this creates **.venv** folder with contents shown below
 
-    ```bash
+    ```{bash}
     (.venv) 8c85906ee187:aws-cdk-pipelines-datalake-infrastructure
 
     user_id$ ls -lart .venv/
@@ -248,28 +250,27 @@ Environment bootstrap is standard CDK process to prepare an AWS environment read
 
  1. Install dependencies. Run the below command
 
-    ```bash
+    ```{bash}
     pip install -r requirements.txt
     ```
 
  1. Expected output: run the below command and verify you will see all dependencies instaled.
 
-    ```bash
+    ```{bash}
     ls -lart .venv/lib/python3.9/site-packages/
     ```
 
  1. Enable execute permissions for scripts.
 
-    ```bash
+    ```{bash}
     chmod 700 ./lib/prerequisites/bootstrap_deployment_account.sh
     chmod 700 ./lib/prerequisites/bootstrap_target_account.sh
-    chmod 700 ./lib/prerequisites/configure_account_parameters.sh
     chmod 700 ./lib/prerequisites/configure_account_secrets.sh
     ```
 
  1. Bootstrap central deployment account. Run the below command:
 
-    ```bash
+    ```{bash}
     ./lib/prerequisites/bootstrap_deployment_account.sh
     ```
 
@@ -317,7 +318,7 @@ Environment bootstrap is standard CDK process to prepare an AWS environment read
   
  1. When you see the following text, enter **y**, and press enter/return
 
-    ```bash
+    ```{bash}
     Are you sure you want to bootstrap {
      "UserId": "user_id",
      "Account": "dev_account_id",
@@ -411,83 +412,41 @@ Environment bootstrap is standard CDK process to prepare an AWS environment read
 
 ### Application configuration
 
-Before we deploy our resources we must provide the manual variables and upon deployment the CDK Pipelines will programmatically provide variables for managed resources. We use [AWS Systems Manager Parameter Store](https://docs.aws.amazon.com/systems-manager/latest/userguide/systems-manager-parameter-store.html) for this and they are are stored in the central deployment account. Follow the below steps:
+Before we deploy our resources we must provide the manual variables and upon deployment the CDK Pipelines will programmatically export outputs for managed resources. Follow the below steps to setup your custom configuration:
 
 1. **Note:** It is safe to commit these values to your repository
 
-1. Setup AWS Configuration for central deployment account.
+1. Go to [configuration.py](./lib/configuration.py) and fill in values under `local_mapping` dictionary within the function `get_local_configuration` as desired.
 
-    ```{bash}
-    export AWS_PROFILE=deployment_account_profile
-    ```
+    Example:
 
-1. Go to [configure_account_parameters.py](./lib/prerequisites/configure_account_parameters.py) and fill in values under `all_parameters` dictionary as desired.
-
-1. Run the below command to configure parameters for all accounts
-
-    **Important:** Your configured environment *must* target the Deployment account
-
-    ```{bash}
-    python3 ./lib/prerequisites/configure_account_parameters.py
-    ```
-
-    When you see text like the following, enter **y**, and press enter/return
-
-    ```{json}
-        {
-        "Deployment": {
-            "account_id": "deployment_account_id",
-            "region": "us-east-2",
-            "github_repository_owner_name": "aws-samples",
-            "github_repository_name": "aws-cdk-pipelines-datalake-infrastructure",
-            "logical_id_prefix": "CdkBlog",
-            "resource_name_prefix": "cdkblog-test"
+    ```{python}
+    local_mapping = {
+        DEPLOYMENT: {
+            ACCOUNT_ID: 'deployment_account_id',
+            REGION: 'us-east-2',
+            GITHUB_REPOSITORY_OWNER_NAME: 'aws-samples', # Note: Use your owner here!
+            GITHUB_REPOSITORY_NAME: 'aws-cdk-pipelines-datalake-infrastructure', # Note: Use your forked repo here!
+            LOGICAL_ID_PREFIX: 'DataLake',
+            RESOURCE_NAME_PREFIX: 'business-name-data-lake', # Important: This is used in resources that must be **globally** unique!
         },
-        "Dev": {
-            "account_id": "dev_account_id",
-            "region": "us-east-2",
-            "vpc_cidr": "10.20.0.0/24"
+        DEV: {
+            ACCOUNT_ID: 'dev_account_id',
+            REGION: 'us-east-2',
+            VPC_CIDR: '10.20.0.0/24'
         },
-        "Test": {
-            "account_id": "test_account_id",
-            "region": "us-east-1",
-            "vpc_cidr": "10.10.0.0/24"
+        TEST: {
+            ACCOUNT_ID: 'test_account_id',
+            REGION: 'us-east-2',
+            VPC_CIDR: '10.10.0.0/24'
         },
-        "Prod": {
-            "account_id": "prod_account_id",
-            "region": "us-east-2",
-            "vpc_cidr": "10.0.0.0/24"
+        PROD: {
+            ACCOUNT_ID: 'prod_account_id',
+            REGION: 'us-east-2',
+            VPC_CIDR: '10.0.0.0/24'
         }
     }
-
-    To account: deployment_account_id? This should be Central Deployment Account Id
     ```
-
-    Expected output 1: you will get an output similar to below
-
-    ```{bash}
-    Pushing Parameter: /DataLake/Deployment/AccountId
-    Pushing Parameter: /DataLake/Deployment/Region
-    Pushing Parameter: /DataLake/Infrastructure/RepositoryOwnerName
-    Pushing Parameter: /DataLake/Infrastructure/RepositoryName
-    Pushing Parameter: /DataLake/Infrastructure/CloudFormationLogicalIdPrefix
-    Pushing Parameter: /DataLake/Infrastructure/ResourceNamePrefix
-    Pushing Parameter: /DataLake/Dev/AccountId
-    Pushing Parameter: /DataLake/Dev/Region
-    Pushing Parameter: /DataLake/Dev/VpcCidr
-    Pushing Parameter: /DataLake/Test/AccountId
-    Pushing Parameter: /DataLake/Test/Region
-    Pushing Parameter: /DataLake/Test/VpcCidr
-    Pushing Parameter: /DataLake/Prod/AccountId
-    Pushing Parameter: /DataLake/Prod/Region
-    Pushing Parameter: /DataLake/Prod/VpcCidr
-    ```
-
-    Expected output 2: In deployment account, in AWS Systems Manager Parameter Store console, you will see parameters similar to below
-
-   ![Alt](./resources/configured_ssm_parameters.png)
-
----
 
 ### AWS CodePipeline and GitHub integration
 
@@ -528,7 +487,7 @@ Configure your AWS profile to target the central Deployment account as an Admini
 1. Sample output:
 
     ```{bash}
-    cross-region-stack-deployment_account_id:us-east-1
+    cross-region-stack-deployment_account_id:us-east-2
 
     DevCdkBlogInfrastructurePipeline
     ProdCdkBlogInfrastructurePipeline
@@ -569,6 +528,10 @@ Pipeline you have created using CDK Pipelines module is self mutating. That mean
 Refer to [cdk_instructions.md](./resources/cdk_instructions.md) for detailed instructions
 
 ---
+
+## Developers
+
+Refer to [](./resources/developer_instructions.md) for notes to Developers on this project
 
 ## Contributors
 

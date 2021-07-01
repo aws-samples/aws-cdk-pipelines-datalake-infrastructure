@@ -1,4 +1,4 @@
-# Copyright 2020 Amazon.com, Inc. or its affiliates. All Rights Reserved.
+# Copyright 2021 Amazon.com, Inc. or its affiliates. All Rights Reserved.
 # SPDX-License-Identifier: MIT-0
 
 import aws_cdk.core as cdk
@@ -8,10 +8,8 @@ import aws_cdk.aws_codepipeline as codepipeline
 import aws_cdk.aws_codepipeline_actions as codepipeline_actions
 
 from .configuration import (
-    CROSS_ACCOUNT_DYNAMODB_ROLE, DEPLOYMENT, GITHUB_TOKEN, VPC_ID, AVAILABILITY_ZONES, SUBNET_IDS, ROUTE_TABLES,
-    SHARED_SECURITY_GROUP_ID, S3_KMS_KEY, S3_ACCESS_LOG_BUCKET, S3_RAW_BUCKET, S3_CONFORMED_BUCKET,
-    S3_PURPOSE_BUILT_BUCKET, get_logical_id_prefix, get_resource_name_prefix,
-    get_path_mappings, get_repository_name, get_repository_owner,
+    DEPLOYMENT, GITHUB_REPOSITORY_NAME, GITHUB_REPOSITORY_OWNER_NAME, GITHUB_TOKEN,
+    get_logical_id_prefix, get_resource_name_prefix, get_all_configurations
 )
 from .pipeline_deploy_stage import PipelineDeployStage
 
@@ -19,11 +17,24 @@ from .pipeline_deploy_stage import PipelineDeployStage
 class PipelineStack(cdk.Stack):
 
     def __init__(
-        self, scope: cdk.Construct, id: str, target_environment: str, target_branch: str, target_aws_env: dict, **kwargs
+        self, scope: cdk.Construct, construct_id: str,
+        target_environment: str, target_branch: str, target_aws_env: dict,
+        **kwargs
     ) -> None:
-        super().__init__(scope, id, **kwargs)
+        """
+        CloudFormation stack to create CDK Pipeline resources (Code Pipeline, Code Build, and ancillary resources).
 
-        self.mappings = get_path_mappings()
+        @param scope cdk.Construct: Parent of this stack, usually an App or a Stage, but could be any construct.
+        @param construct_id str:
+            The construct ID of this stack. If stackName is not explicitly defined,
+            this id (and any parent IDs) will be used to determine the physical ID of the stack.
+        @param target_environment str: The target environment for stacks in the deploy stage
+        @param target_branch str: The source branch for polling
+        @param target_aws_env dict: The CDK env variable used for stacks in the deploy stage
+        """
+        super().__init__(scope, construct_id, **kwargs)
+
+        self.mappings = get_all_configurations()
         self.create_environment_pipeline(
             target_environment,
             target_branch,
@@ -31,6 +42,14 @@ class PipelineStack(cdk.Stack):
         )
 
     def create_environment_pipeline(self, target_environment, target_branch, target_aws_env):
+        """
+        Creates CloudFormation stack to create CDK Pipeline resources such as:
+        Code Pipeline, Code Build, and ancillary resources.
+
+        @param target_environment str: The target environment for stacks in the deploy stage
+        @param target_branch str: The source branch for polling
+        @param target_aws_env dict: The CDK env variable used for stacks in the deploy stage
+        """
         source_artifact = codepipeline.Artifact()
         cloud_assembly_artifact = codepipeline.Artifact()
         logical_id_prefix = get_logical_id_prefix()
@@ -48,24 +67,14 @@ class PipelineStack(cdk.Stack):
                     self.mappings[DEPLOYMENT][GITHUB_TOKEN]
                 ),
                 trigger=codepipeline_actions.GitHubTrigger.POLL,
-                owner=get_repository_owner(),
-                repo=get_repository_name(),
+                owner=self.mappings[DEPLOYMENT][GITHUB_REPOSITORY_OWNER_NAME],
+                repo=self.mappings[DEPLOYMENT][GITHUB_REPOSITORY_NAME],
             ),
             synth_action=pipelines.SimpleSynthAction.standard_npm_synth(
                 source_artifact=source_artifact,
                 cloud_assembly_artifact=cloud_assembly_artifact,
                 install_command='npm install -g aws-cdk && pip3 install -r requirements.txt',
                 role_policy_statements=[
-                    iam.PolicyStatement(
-                        sid='InfrastructurePipelineParameterStorePolicy',
-                        effect=iam.Effect.ALLOW,
-                        actions=[
-                            'ssm:*',
-                        ],
-                        resources=[
-                            f'arn:aws:ssm:{self.region}:{self.account}:parameter/DataLake/*',
-                        ],
-                    ),
                     iam.PolicyStatement(
                         sid='InfrastructurePipelineSecretsManagerPolicy',
                         effect=iam.Effect.ALLOW,
@@ -122,130 +131,12 @@ class PipelineStack(cdk.Stack):
             cross_account_keys=True,
         )
 
-        deploy_stage = PipelineDeployStage(
-            self,
-            target_environment,
-            target_environment=target_environment,
-            deployment_account_id=self.account,
-            env=target_aws_env,
+        pipeline.add_application_stage(
+            PipelineDeployStage(
+                self,
+                target_environment,
+                target_environment=target_environment,
+                deployment_account_id=self.account,
+                env=target_aws_env,
+            )
         )
-        app_stage = pipeline.add_application_stage(deploy_stage)
-        app_stage.add_actions(pipelines.ShellScriptAction(
-            action_name='SyncParametersWithOutputsAction',
-            run_order=app_stage.next_sequential_run_order(),  # run after deploy
-            additional_artifacts=[source_artifact],
-            commands=[
-                f"""
-                    aws ssm put-parameter \
-                        --name {self.mappings[target_environment][VPC_ID]} \
-                        --description 'Id for Data Lake VPC' \
-                        --value $VPC_ID \
-                        --type String \
-                        --overwrite
-                """,
-                f"""
-                    aws ssm put-parameter \
-                        --name {self.mappings[target_environment][AVAILABILITY_ZONES]} \
-                        --description 'Names for Data Lake VPC Availability Zones' \
-                        --value $AVAILABILITY_ZONES \
-                        --type String \
-                        --overwrite
-                """,
-                f"""
-                    aws ssm put-parameter \
-                        --name {self.mappings[target_environment][SUBNET_IDS]} \
-                        --description 'Comma-seperated Ids for Data Lake VPC Private Subnets' \
-                        --value $PRIVATE_SUBNETS \
-                        --type String \
-                        --overwrite
-                """,
-                f"""
-                    aws ssm put-parameter \
-                        --name {self.mappings[target_environment][ROUTE_TABLES]} \
-                        --description 'Comma-seperated Ids for Data Lake VPC Private Subnets Route Tables' \
-                        --value $ROUTE_TABLES \
-                        --type String \
-                        --overwrite
-                """,
-                f"""
-                    aws ssm put-parameter \
-                        --name {self.mappings[target_environment][SHARED_SECURITY_GROUP_ID]} \
-                        --description 'Id for Shared SecurityGroup with self-referencing ingress rule' \
-                        --value $SECURITY_GROUP_ID \
-                        --type String \
-                        --overwrite
-                """,
-                f"""
-                    aws ssm put-parameter \
-                        --name {self.mappings[target_environment][S3_KMS_KEY]} \
-                        --description 'Arn for KMS Key used for securing S3 Buckets' \
-                        --value $KMS_KEY \
-                        --type String \
-                        --overwrite
-                """,
-                f"""
-                    aws ssm put-parameter \
-                        --name {self.mappings[target_environment][S3_ACCESS_LOG_BUCKET]} \
-                        --description 'Name of S3 Access Logs bucket' \
-                        --value $ACCESS_LOGS_BUCKET_NAME \
-                        --type String \
-                        --overwrite
-                """,
-                f"""
-                    aws ssm put-parameter \
-                        --name {self.mappings[target_environment][S3_RAW_BUCKET]} \
-                        --description 'Name of Raw bucket' \
-                        --value $RAW_BUCKET_NAME \
-                        --type String \
-                        --overwrite
-                """,
-                f"""
-                    aws ssm put-parameter \
-                        --name {self.mappings[target_environment][S3_CONFORMED_BUCKET]} \
-                        --description 'Name of Conformed bucket' \
-                        --value $CONFORMED_BUCKET_NAME \
-                        --type String \
-                        --overwrite
-                """,
-                f"""
-                    aws ssm put-parameter \
-                        --name {self.mappings[target_environment][S3_PURPOSE_BUILT_BUCKET]} \
-                        --description 'Name of Purpose Built bucket' \
-                        --value $PURPOSE_BUILT_BUCKET_NAME \
-                        --type String \
-                        --overwrite
-                """,
-                f"""
-                    aws ssm put-parameter \
-                        --name {self.mappings[target_environment][CROSS_ACCOUNT_DYNAMODB_ROLE]} \
-                        --description 'ARN of the cross account DynamoDb Role' \
-                        --value $CROSS_ACCOUNT_DYNAMODB_ROLE \
-                        --type String \
-                        --overwrite
-                """,
-            ],
-            use_outputs={
-                'VPC_ID': pipeline.stack_output(deploy_stage.vpc_id),
-                'AVAILABILITY_ZONES': pipeline.stack_output(deploy_stage.vpc_availability_zones),
-                'PRIVATE_SUBNETS': pipeline.stack_output(deploy_stage.vpc_private_subnets),
-                'ROUTE_TABLES': pipeline.stack_output(deploy_stage.vpc_route_tables),
-                'SECURITY_GROUP_ID': pipeline.stack_output(deploy_stage.shared_security_group_ingress),
-                'KMS_KEY': pipeline.stack_output(deploy_stage.s3_kms_key),
-                'ACCESS_LOGS_BUCKET_NAME': pipeline.stack_output(deploy_stage.access_logs_bucket),
-                'RAW_BUCKET_NAME': pipeline.stack_output(deploy_stage.raw_bucket),
-                'CONFORMED_BUCKET_NAME': pipeline.stack_output(deploy_stage.conformed_bucket),
-                'PURPOSE_BUILT_BUCKET_NAME': pipeline.stack_output(deploy_stage.purpose_built_bucket),
-                'CROSS_ACCOUNT_DYNAMODB_ROLE': pipeline.stack_output(deploy_stage.cross_account_role),
-            },
-            role_policy_statements=[
-                iam.PolicyStatement(
-                    sid='InfrastructurePipelineParameterStorePolicy',
-                    effect=iam.Effect.ALLOW,
-                    actions=[
-                        'ssm:*',
-                    ],
-                    resources=[
-                        f'arn:aws:ssm:{self.region}:{self.account}:parameter/DataLake/*',
-                    ],
-                )]
-        ))

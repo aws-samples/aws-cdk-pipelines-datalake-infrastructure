@@ -1,8 +1,7 @@
-# Copyright 2020 Amazon.com, Inc. or its affiliates. All Rights Reserved.
+# Copyright 2021 Amazon.com, Inc. or its affiliates. All Rights Reserved.
 # SPDX-License-Identifier: MIT-0
 
 import re
-import boto3
 
 # Environments (targeted at accounts)
 DEPLOYMENT = 'Deployment'
@@ -39,35 +38,26 @@ S3_PURPOSE_BUILT_BUCKET = 's3_purpose_built_bucket'
 CROSS_ACCOUNT_DYNAMODB_ROLE = 'cross_account_dynamodb_role'
 
 
-# def get_path_mapping(environment: str) -> dict:
-#     return {
-#         ENVIRONMENT: environment,
-#         ACCOUNT_ID: f'/DataLake/{environment}/AccountId',
-#         REGION: f'/DataLake/{environment}/Region',
-#         VPC_CIDR: f'/DataLake/{environment}/VpcCidr',
-#         VPC_ID: f'/DataLake/{environment}/VpcId',
-#         AVAILABILITY_ZONES: f'/DataLake/{environment}/AvailabilityZones',
-#         SUBNET_IDS: f'/DataLake/{environment}/SubnetIds',
-#         ROUTE_TABLES: f'/DataLake/{environment}/RouteTables',
-#         SHARED_SECURITY_GROUP_ID: f'/DataLake/{environment}/SharedSecurityGroupId',
-#         S3_KMS_KEY: f'/DataLake/{environment}/S3KmsKeyArn',
-#         S3_ACCESS_LOG_BUCKET: f'/DataLake/{environment}/S3AccessLogBucket',
-#         S3_RAW_BUCKET: f'/DataLake/{environment}/RawBucketName',
-#         S3_CONFORMED_BUCKET: f'/DataLake/{environment}/ConformedBucketName',
-#         S3_PURPOSE_BUILT_BUCKET: f'/DataLake/{environment}/PurposeBuiltBucketName',
-#         CROSS_ACCOUNT_DYNAMODB_ROLE: f'/DataLake/{environment}/CrossAccountDynamoDbRoleArn'
-#     }
-
 def get_local_configuration(environment: str) -> dict:
+    """
+    Provides manually configured variables that are validated for quality and safety.
+
+    @param: environment str: The environment used to retrieve corresponding configuration
+
+    @raises: Exception: Throws an exception if the resource_name_prefix does not conform
+    @raises: Exception: Throws an exception if the requested environment does not exist
+
+    @returns: dict:
+    """
     local_mapping = {
         DEPLOYMENT: {
             ACCOUNT_ID: '',
             REGION: 'us-east-2',
             GITHUB_REPOSITORY_OWNER_NAME: '',
             GITHUB_REPOSITORY_NAME: '',
-            LOGICAL_ID_PREFIX: 'TestCdk',
+            LOGICAL_ID_PREFIX: '',
             # Important: Resource names may only contain Alphanumeric and hyphens and cannot contain trailing hyphens
-            RESOURCE_NAME_PREFIX: 'test-cdk',
+            RESOURCE_NAME_PREFIX: '',
         },
         DEV: {
             ACCOUNT_ID: '',
@@ -101,6 +91,13 @@ def get_local_configuration(environment: str) -> dict:
 
 
 def get_environment_configuration(environment: str) -> dict:
+    """
+    Provides all configuration values for the given target environment
+
+    @param environment str: The environment used to retrieve corresponding configuration
+
+    @return: dict:
+    """
     cloudformation_output_mapping = {
         ENVIRONMENT: environment,
         VPC_ID: f'{environment}VpcId',
@@ -120,8 +117,11 @@ def get_environment_configuration(environment: str) -> dict:
 
 
 def get_all_configurations() -> dict:
-    """Returns a dict mapping of all keys used for configurations of environments.
-    These keys correspond to static values, CloudForamtion outputs, and Secrets Manager (passwords only) records.
+    """
+    Returns a dict mapping of configurations for all environments.
+    These keys correspond to static values, CloudFormation outputs, and Secrets Manager (passwords only) records.
+
+    @return: dict:
     """
     return {
         DEPLOYMENT: {
@@ -135,13 +135,17 @@ def get_all_configurations() -> dict:
     }
 
 
-def get_ssm_parameter(parameter_key: str):
-    return boto3.client('ssm').get_parameter(Name=parameter_key)['Parameter']['Value']
-
-
 def get_logical_id_prefix() -> str:
+    """Returns the logical id prefix to apply to all CloudFormation resources
+
+    @return: str:
+    """
     return get_local_configuration(DEPLOYMENT)[LOGICAL_ID_PREFIX]
 
 
 def get_resource_name_prefix() -> str:
+    """Returns the resource name prefix to apply to all resources names
+
+    @return: str:
+    """
     return get_local_configuration(DEPLOYMENT)[RESOURCE_NAME_PREFIX]
