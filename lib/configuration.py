@@ -58,7 +58,7 @@ def get_local_configuration(environment: str) -> dict:
             # This is used in the Logical Id of CloudFormation resources.
             #   We recommend Capital case for consistency.
             # Example: DataLakeCdkBlog
-            LOGICAL_ID_PREFIX: 'DataLakeCdkBlog',
+            LOGICAL_ID_PREFIX: 'DataLakeCDKBlog',
             # Important: This is used in resources that must be **globally** unique!
             #   Resource names may only contain Alphanumeric and hyphens and cannot contain trailing hyphens.
             # Example: unique-identifier-data-lake
