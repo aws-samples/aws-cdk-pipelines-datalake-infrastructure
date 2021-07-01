@@ -531,7 +531,7 @@ Refer to [cdk_instructions.md](./resources/cdk_instructions.md) for detailed ins
 
 ## Developers
 
-Refer to [](./resources/developer_instructions.md) for notes to Developers on this project
+Refer to [developer_instructions.md](./resources/developer_instructions.md) for notes to Developers on this project
 
 ## Contributors
 
