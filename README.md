@@ -462,7 +462,7 @@ Integration between AWS CodePipeline and GitHub requires a personal access token
 
 1. Create a [personal access token](https://docs.github.com/en/github/authenticating-to-github/keeping-your-account-and-data-secure/creating-a-personal-access-token)
 
-1. Go to [configure_account_secrets.py](./lib/prerequisites/configure_account_secrets.py) and fill in the value for attribute **GITHUB_TOKEN** in `all_secrets` dictionary
+1. Go to [configure_account_secrets.py](./lib/prerequisites/configure_account_secrets.py) and fill in the value for attribute **MY_GITHUB_TOKEN**
 
 1. Run the below command
 
