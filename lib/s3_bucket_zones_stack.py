@@ -105,8 +105,8 @@ class S3BucketZonesStack(cdk.Stack):
         Creates an AWS KMS Key and attaches a Key policy
 
         @param deployment_account_id: The id for the deployment account
-        @param logical_id_prefix:
-        @param resource_name_prefix:
+        @param logical_id str: The logical id prefix to apply to all CloudFormation resources
+        @param resource_name_prefix: The resource name prefix to apply to all resource names
         """
         s3_kms_key = kms.Key(
             self,
