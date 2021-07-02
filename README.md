@@ -476,8 +476,8 @@ Pipeline you have created using CDK Pipelines module is self mutating. That mean
    1. Dev-DevDataLakeCDKBlogInfrastructureS3BucketZones
    1. Dev-DevDataLakeCDKBlogInfrastructureIam
 
-`**Note:**
-    1. Deletion of *Dev-DevDataLakeCDKBlogInfrastructureS3BucketZones* will delete the S3 buckets (raw, conformed, and purpose-built). This behavior can be changed by modifying the retention policy in [s3_bucket_zones_stack.py](.lib/s3_bucket_zones_stack.py#L38)
+   **Note:**
+    1. Deletion of *Dev-DevDataLakeCDKBlogInfrastructureS3BucketZones* will delete the S3 buckets (raw, conformed, and purpose-built). This behavior can be changed by modifying the retention policy in [s3_bucket_zones_stack.py](lib/s3_bucket_zones_stack.py#L38)
 
 1. To delete stacks in **test** account, log onto Dev account, go to AWS CloudFormation console and delete the following stacks:
 
