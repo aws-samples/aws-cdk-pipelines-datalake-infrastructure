@@ -16,9 +16,9 @@ This solution helps you:
 
 * [Data lake architecture](#data-lake-architecture)
 * [Data lake infrastructure](#data-lake-infrastructure)
-* [Centralized deployment](##centralized-deployment)
-* [Continuous delivery of data lake infrastructure](#continuos-delivery-of-data-lake-ETL-using-cdk-pipelines)
-* [Source code structure](#Source-Code-Structure)
+* [Centralized deployment](#centralized-deployment)
+* [Continuous delivery of data lake infrastructure](#continuos-delivery-of-data-lake-etl-using-cdk-pipelines)
+* [Source code structure](#source-code-structure)
 * [Prerequisites](#prerequisites)
   * [Software installation](#software-installation)
   * [AWS environment bootstrapping](#aws-environment-bootstrapping)
@@ -27,7 +27,9 @@ This solution helps you:
 * [Deployment](#deployment)
   * [Deploying for the first time](#deploying-for-the-first-time)
   * [Iterative Deployment](#iterative-deployment)
-* [AWS CDK](#AWS-CDK)
+* [Clean Up](#clean-up)
+* [AWS CDK](#aws-cdk)
+* [Developer Instructions](#developer-instructions)
 * [Contributors](#contributors)
 * [License Summary](#license-summary)
 
@@ -144,7 +146,7 @@ This section has various steps you need to perform before you deploy data lake r
 
 1. **AWS CDK** - install compatible AWS CDK version
 
-   ```{bash}
+   ```bash
    npm install -g aws-cdk@1.109.0
    ```
 
@@ -162,13 +164,13 @@ Environment bootstrap is standard CDK process to prepare an AWS environment read
 
  1. Create Python virtual environment. This is a one-time activity.
 
-    ```{bash}
+    ```bash
     python3 -m venv .venv
     ```
 
  1. Expected output: you will see a folder with name **.venv** created in project root folder. You can run the following command to see its contents ```ls -lart .venv/```
 
-    ```{bash}
+    ```bash
     total 8
     drwxr-xr-x   2 user_id  staff   64 Jun 23 15:25 include
     drwxr-xr-x   3 user_id  staff   96 Jun 23 15:25 lib
@@ -180,32 +182,32 @@ Environment bootstrap is standard CDK process to prepare an AWS environment read
 
  1. Activate Python virtual environment
 
-    ```{bash}
+    ```bash
     source .venv/bin/activate
     ```
 
  1. Install dependencies
 
-    ```{bash}
+    ```bash
     pip install -r requirements.txt
     ```
 
  1. Expected output: run the below command and verify all dependencies are installed
 
-    ```{bash}
+    ```bash
     ls -lart .venv/lib/python3.9/site-packages/
     ```
 
  1. Enable execute permissions for scripts
 
-    ```{bash}
+    ```bash
     chmod 700 ./lib/prerequisites/bootstrap_deployment_account.sh
     chmod 700 ./lib/prerequisites/bootstrap_target_account.sh
     ```
 
  1. Before you bootstrap **central deployment account** account, set environment variable
 
-    ```{bash}
+    ```bash
     export AWS_PROFILE=replace_it_with_deployment_account_profile_name_b4_running
     ```
 
@@ -215,13 +217,13 @@ Environment bootstrap is standard CDK process to prepare an AWS environment read
 
  1. Bootstrap central deployment account
 
-    ```{bash}
+    ```bash
     ./lib/prerequisites/bootstrap_deployment_account.sh
     ```
 
  1. When you see the following text, enter **y**, and press enter/return
 
-    ```{bash}
+    ```bash
     Are you sure you want to bootstrap {
        "UserId": "user_id",
        "Account": "deployment_account_id",
@@ -239,7 +241,7 @@ Environment bootstrap is standard CDK process to prepare an AWS environment read
 
  1. Before you bootstrap **dev** account, set environment variable
 
-    ```{bash}
+    ```bash
     export AWS_PROFILE=replace_it_with_dev_account_profile_name_b4_running
     ```
 
@@ -247,13 +249,13 @@ Environment bootstrap is standard CDK process to prepare an AWS environment read
 
     **Important:** Your configured environment *must* target the Dev account
 
-    ```{bash}
+    ```bash
     ./lib/prerequisites/bootstrap_target_account.sh <central_deployment_account_id> arn:aws:iam::aws:policy/AdministratorAccess
     ```
   
     When you see the following text, enter **y**, and press enter/return
 
-    ```{bash}
+    ```bash
     Are you sure you want to bootstrap {
      "UserId": "user_id",
      "Account": "dev_account_id",
@@ -271,7 +273,7 @@ Environment bootstrap is standard CDK process to prepare an AWS environment read
 
  1. Before you bootstrap **test** account, set environment variable
 
-    ```{bash}
+    ```bash
     export AWS_PROFILE=replace_it_with_test_account_profile_name_b4_running
     ```
 
@@ -279,13 +281,13 @@ Environment bootstrap is standard CDK process to prepare an AWS environment read
 
     **Important:** Your configured environment *must* target the Test account
 
-    ```{bash}
+    ```bash
     ./lib/prerequisites/bootstrap_target_account.sh <central_deployment_account_id> arn:aws:iam::aws:policy/AdministratorAccess
     ```
 
     When you see the following text, enter **y**, and press enter/return
 
-    ```{bash}
+    ```bash
     Are you sure you want to bootstrap {
        "UserId": "user_id",
        "Account": "test_account_id",
@@ -303,7 +305,7 @@ Environment bootstrap is standard CDK process to prepare an AWS environment read
 
  1. Before you bootstrap **prod** account, set environment variable
 
-    ```{bash}
+    ```bash
     export AWS_PROFILE=replace_it_with_prod_account_profile_name_b4_running
     ```
 
@@ -311,13 +313,13 @@ Environment bootstrap is standard CDK process to prepare an AWS environment read
 
     **Important:** Your configured environment *must* target the Prod account
 
-    ```{bash}
+    ```bash
     ./lib/prerequisites/bootstrap_target_account.sh <central_deployment_account_id> arn:aws:iam::aws:policy/AdministratorAccess
     ```
 
     When you see the following text, enter **y**, and press enter/return
 
-    ```{bash}
+    ```bash
     Are you sure you want to bootstrap {
        "UserId": "user_id",
        "Account": "prod_account_id",
@@ -345,7 +347,7 @@ Before we deploy our resources we must provide the manual variables and upon dep
 
     Example:
 
-    ```{python}
+    ```python
     local_mapping = {
         DEPLOYMENT: {
             ACCOUNT_ID: 'deployment_account_id',
@@ -391,13 +393,13 @@ Integration between AWS CodePipeline and GitHub requires a personal access token
 
 1. Run the below command
 
-    ```{bash}
+    ```bash
     python3 ./lib/prerequisites/configure_account_secrets.py
     ```
 
 1. Expected output 1:
 
-    ```{bash}
+    ```bash
     Pushing secret: /DataLake/GitHubToken
     ```
 
@@ -416,7 +418,7 @@ Configure your AWS profile to target the central Deployment account as an Admini
 1. Run the command ```cdk ls```
 1. Expected output: It lists CDK Pipelines and target account stacks on the console. A sample is below:
 
-    ```{bash}
+    ```bash
     DevDataLakeCDKBlogInfrastructurePipeline
     ProdDataLakeCDKBlogInfrastructurePipeline
     TestDataLakeCDKBlogInfrastructurePipeline
@@ -436,7 +438,7 @@ Configure your AWS profile to target the central Deployment account as an Admini
 
 1. Set your environment variable back to deployment account
 
-    ```{bash}
+    ```bash
     export AWS_PROFILE=deployment_account_profile_name_here
     ```
 
@@ -458,13 +460,60 @@ Pipeline you have created using CDK Pipelines module is self mutating. That mean
 
 ---
 
+## Clean up
+
+1. Delete stacks using the command ```cdk destroy --all```. When you see the following text, enter **y**, and press enter/return.
+
+   ```bash
+   Are you sure you want to delete: TestDataLakeCDKBlogInfrastructurePipeline, ProdDataLakeCDKBlogInfrastructurePipeline, DevDataLakeCDKBlogInfrastructurePipeline (y/n)?
+   ```
+
+   Note: This operation deletes stacks only in central deployment account
+
+1. To delete stacks in **development** account, log onto Dev account, go to AWS CloudFormation console and delete the following stacks:
+
+   1. Dev-DevDataLakeCDKBlogInfrastructureVpc
+   1. Dev-DevDataLakeCDKBlogInfrastructureS3BucketZones
+   1. Dev-DevDataLakeCDKBlogInfrastructureIam
+
+   **Note:**
+    1. Deletion of *Dev-DevDataLakeCDKBlogInfrastructureS3BucketZones* will delete the S3 buckets (raw, conformed, and purpose-built). This behavior can be changed by modifying the retention policy in [s3_bucket_zones_stack.py](lib/s3_bucket_zones_stack.py#L38)
+
+1. To delete stacks in **test** account, log onto Dev account, go to AWS CloudFormation console and delete the following stacks:
+
+   1. Test-TestDataLakeCDKBlogInfrastructureVpc
+   1. Test-TestDataLakeCDKBlogInfrastructureS3BucketZones
+   1. Test-TestDataLakeCDKBlogInfrastructureIam
+
+   **Note:**
+      1. The S3 buckets (raw, conformed, and purpose-built) have retention policies attached and must be removed manually when they are no longer needed.
+
+1. To delete stacks in **prod** account, log onto Dev account, go to AWS CloudFormation console and delete the following stacks:
+
+   1. Prod-ProdDataLakeCDKBlogInfrastructureVpc
+   1. Prod-ProdDataLakeCDKBlogInfrastructureS3BucketZones
+   1. Prod-ProdDataLakeCDKBlogInfrastructureIam
+
+   **Note:**
+      1. The S3 buckets (raw, conformed, and purpose-built) have retention policies attached and must be removed manually when they are no longer needed.
+
+1. **Optional:**
+
+   1. If you are not using AWS CDK for other purposes, you can also remove ```CDKToolkit``` stack in each target account.
+
+   1. Note: The asset S3 bucket has a retention policy and must be removed manually.
+
+1. For more details refer to [AWS CDK Toolkit](https://docs.aws.amazon.com/cdk/latest/guide/cli.html)
+
+---
+
 ## AWS CDK
 
 Refer to [cdk_instructions.md](./resources/cdk_instructions.md) for detailed instructions
 
 ---
 
-## Developers
+## Developer Instructions
 
 Refer to [developer_instructions.md](./resources/developer_instructions.md) for notes to Developers on this project
 
