@@ -41,7 +41,7 @@ else:
             app,
             f'{target_environment}{logical_id_prefix}InfrastructurePipeline',
             target_environment=DEV,
-            target_branch='main',
+            target_branch='cdk_testing',
             target_aws_env=dev_aws_env,
             env=deployment_aws_env,
         )

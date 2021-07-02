@@ -4,7 +4,7 @@
 import aws_cdk.core as cdk
 from aws_cdk.aws_iam import AccountPrincipal, Effect, PolicyDocument, PolicyStatement, Role
 from .configuration import (
-    CROSS_ACCOUNT_DYNAMODB_ROLE, get_path_mapping, get_logical_id_prefix, get_resource_name_prefix
+    CROSS_ACCOUNT_DYNAMODB_ROLE, get_logical_id_prefix, get_resource_name_prefix, get_environment_configuration
 )
 
 
@@ -27,7 +27,7 @@ class IamStack(cdk.Stack):
         """
         super().__init__(scope, construct_id, **kwargs)
 
-        mappings = get_path_mapping(target_environment)
+        mappings = get_environment_configuration(target_environment)
         logical_id_prefix = get_logical_id_prefix()
         resource_name_prefix = get_resource_name_prefix()
 

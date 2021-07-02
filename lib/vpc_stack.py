@@ -25,7 +25,7 @@ class VpcStack(cdk.Stack):
         """
         super().__init__(scope, construct_id, **kwargs)
 
-        mappings = get_environment_configuration[target_environment]
+        mappings = get_environment_configuration(target_environment)
         vpc_cidr = mappings[VPC_CIDR]
         logical_id_prefix = get_logical_id_prefix()
         vpc = ec2.Vpc(self, f'{logical_id_prefix}Vpc', cidr=vpc_cidr)

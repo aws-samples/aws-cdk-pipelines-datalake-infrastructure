@@ -223,7 +223,11 @@ class S3BucketZonesStack(cdk.Stack):
         Creates an Amazon S3 bucket to store S3 server access logs. It attaches bucket policy with necessary guardrails.
         It enables server-side encryption using provided KMS key and leverage S3 bucket key feature.
 
+<<<<<<< HEAD
         @param logical_id str: The logical id to apply to the bucket
+=======
+        @param logical_id str: The logical id prefix to apply to all CloudFormation resources
+>>>>>>> upstream/main
         @param bucket_name str: The name for the bucket resource
         @param s3_kms_key kms.Key: The KMS Key to use for encryption of data at rest
 
