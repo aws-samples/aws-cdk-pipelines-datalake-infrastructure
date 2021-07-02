@@ -16,7 +16,7 @@ This solution helps you:
 
 * [Data lake architecture](#data-lake-architecture)
 * [Data lake infrastructure](#data-lake-infrastructure)
-* [Centralized deployment](##centralized-deployment)
+* [Centralized deployment](#centralized-deployment)
 * [Continuous delivery of data lake infrastructure](#continuos-delivery-of-data-lake-etl-using-cdk-pipelines)
 * [Source code structure](#source-code-structure)
 * [Prerequisites](#prerequisites)
