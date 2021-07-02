@@ -4,7 +4,8 @@
 import aws_cdk.core as cdk
 import aws_cdk.aws_ec2 as ec2
 from .configuration import (
-    AVAILABILITY_ZONES, ROUTE_TABLES, SHARED_SECURITY_GROUP_ID, SUBNET_IDS, VPC_CIDR, VPC_ID,
+    AVAILABILITY_ZONE_1, AVAILABILITY_ZONE_2, AVAILABILITY_ZONE_3, ROUTE_TABLE_1, ROUTE_TABLE_2, ROUTE_TABLE_3,
+    SHARED_SECURITY_GROUP_ID, SUBNET_ID_1, SUBNET_ID_2, SUBNET_ID_3, VPC_CIDR, VPC_ID,
     get_environment_configuration, get_logical_id_prefix
 )
 
@@ -83,21 +84,57 @@ class VpcStack(cdk.Stack):
         )
         cdk.CfnOutput(
             self,
-            f'{target_environment}{logical_id_prefix}VpcAvailabilityZones',
-            value=",".join(vpc.availability_zones),
-            export_name=mappings[AVAILABILITY_ZONES],
+            f'{target_environment}{logical_id_prefix}VpcAvailabilityZone1',
+            value=vpc.availability_zones[0],
+            export_name=mappings[AVAILABILITY_ZONE_1],
         )
         cdk.CfnOutput(
             self,
-            f'{target_environment}{logical_id_prefix}VpcPrivateSubnets',
-            value=",".join(map(lambda subnet: subnet.subnet_id, vpc.private_subnets)),
-            export_name=mappings[SUBNET_IDS],
+            f'{target_environment}{logical_id_prefix}VpcAvailabilityZone2',
+            value=vpc.availability_zones[1],
+            export_name=mappings[AVAILABILITY_ZONE_2],
         )
         cdk.CfnOutput(
             self,
-            f'{target_environment}{logical_id_prefix}VpcRouteTables',
-            value=",".join(map(lambda subnet: subnet.route_table.route_table_id, vpc.private_subnets)),
-            export_name=mappings[ROUTE_TABLES],
+            f'{target_environment}{logical_id_prefix}VpcAvailabilityZone3',
+            value=vpc.availability_zones[2],
+            export_name=mappings[AVAILABILITY_ZONE_3],
+        )
+        cdk.CfnOutput(
+            self,
+            f'{target_environment}{logical_id_prefix}VpcPrivateSubnet1',
+            value=vpc.private_subnets[0].subnet_id,
+            export_name=mappings[SUBNET_ID_1],
+        )
+        cdk.CfnOutput(
+            self,
+            f'{target_environment}{logical_id_prefix}VpcPrivateSubnet2',
+            value=vpc.private_subnets[1].subnet_id,
+            export_name=mappings[SUBNET_ID_2],
+        )
+        cdk.CfnOutput(
+            self,
+            f'{target_environment}{logical_id_prefix}VpcPrivateSubnet3',
+            value=vpc.private_subnets[2].subnet_id,
+            export_name=mappings[SUBNET_ID_3],
+        )
+        cdk.CfnOutput(
+            self,
+            f'{target_environment}{logical_id_prefix}VpcRouteTable1',
+            value=vpc.private_subnets[0].route_table.route_table_id,
+            export_name=mappings[ROUTE_TABLE_1],
+        )
+        cdk.CfnOutput(
+            self,
+            f'{target_environment}{logical_id_prefix}VpcRouteTable2',
+            value=vpc.private_subnets[1].route_table.route_table_id,
+            export_name=mappings[ROUTE_TABLE_2],
+        )
+        cdk.CfnOutput(
+            self,
+            f'{target_environment}{logical_id_prefix}VpcRouteTable3',
+            value=vpc.private_subnets[2].route_table.route_table_id,
+            export_name=mappings[ROUTE_TABLE_3],
         )
         cdk.CfnOutput(
             self,

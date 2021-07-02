@@ -16,7 +16,8 @@ if __name__ == '__main__':
         raise Exception(f'You must provide a value for: {MY_GITHUB_TOKEN}')
 
     response = input((
-        f'Are you sure you want to add a secret to AWS Secrets Manager with name {get_all_configurations()[DEPLOYMENT][GITHUB_TOKEN]} '
+        f'Are you sure you want to add a secret to AWS Secrets Manager with name '
+        f'{get_all_configurations()[DEPLOYMENT][GITHUB_TOKEN]} '
         f'in account: {boto3.client("sts").get_caller_identity().get("Account")}?\n\n'
         'This should be the Central Deployment Account Id\n\n'
         '(y/n)'

@@ -17,8 +17,8 @@ This solution helps you:
 * [Data lake architecture](#data-lake-architecture)
 * [Data lake infrastructure](#data-lake-infrastructure)
 * [Centralized deployment](##centralized-deployment)
-* [Continuous delivery of data lake infrastructure](#continuos-delivery-of-data-lake-ETL-using-cdk-pipelines)
-* [Source code structure](#Source-Code-Structure)
+* [Continuous delivery of data lake infrastructure](#continuos-delivery-of-data-lake-etl-using-cdk-pipelines)
+* [Source code structure](#source-code-structure)
 * [Prerequisites](#prerequisites)
   * [Software installation](#software-installation)
   * [AWS environment bootstrapping](#aws-environment-bootstrapping)
@@ -27,7 +27,9 @@ This solution helps you:
 * [Deployment](#deployment)
   * [Deploying for the first time](#deploying-for-the-first-time)
   * [Iterative Deployment](#iterative-deployment)
-* [AWS CDK](#AWS-CDK)
+* [Clean Up](#clean-up)
+* [AWS CDK](#aws-cdk)
+* [Developer Instructions](#developer-instructions)
 * [Contributors](#contributors)
 * [License Summary](#license-summary)
 
@@ -458,13 +460,60 @@ Pipeline you have created using CDK Pipelines module is self mutating. That mean
 
 ---
 
+## Clean up
+
+1. Delete stacks using the command ```cdk destroy --all```. When you see the following text, enter **y**, and press enter/return.
+
+   ```{bash}
+   Are you sure you want to delete: TestDataLakeCDKBlogInfrastructurePipeline, ProdDataLakeCDKBlogInfrastructurePipeline, DevDataLakeCDKBlogInfrastructurePipeline (y/n)?
+   ```
+
+   Note: This operation deletes stacks only in central deployment account
+
+1. To delete stacks in **development** account, log onto Dev account, go to AWS CloudFormation console and delete the following stacks:
+
+   1. Dev-DevDataLakeCDKBlogInfrastructureVpc
+   1. Dev-DevDataLakeCDKBlogInfrastructureS3BucketZones
+   1. Dev-DevDataLakeCDKBlogInfrastructureIam
+
+`**Note:**
+    1. Deletion of *Dev-DevDataLakeCDKBlogInfrastructureS3BucketZones* will delete the S3 buckets (raw, conformed, and purpose-built). This behavior can be changed by modifying the retention policy in [s3_bucket_zones_stack.py](.lib/s3_bucket_zones_stack.py#L38)
+
+1. To delete stacks in **test** account, log onto Dev account, go to AWS CloudFormation console and delete the following stacks:
+
+   1. Test-TestDataLakeCDKBlogInfrastructureVpc
+   1. Test-TestDataLakeCDKBlogInfrastructureS3BucketZones
+   1. Test-TestDataLakeCDKBlogInfrastructureIam
+
+   **Note:**
+      1. The S3 buckets (raw, conformed, and purpose-built) have retention policies attached and must be removed manually when they are no longer needed.
+
+1. To delete stacks in **prod** account, log onto Dev account, go to AWS CloudFormation console and delete the following stacks:
+
+   1. Prod-ProdDataLakeCDKBlogInfrastructureVpc
+   1. Prod-ProdDataLakeCDKBlogInfrastructureS3BucketZones
+   1. Prod-ProdDataLakeCDKBlogInfrastructureIam
+
+   **Note:**
+      1. The S3 buckets (raw, conformed, and purpose-built) have retention policies attached and must be removed manually when they are no longer needed.
+
+1. **Optional:**
+
+   1. If you are not using AWS CDK for other purposes, you can also remove ```CDKToolkit``` stack in each target account.
+
+   1. Note: The asset S3 bucket has a retention policy and must be removed manually.
+
+1. For more details refer to [AWS CDK Toolkit](https://docs.aws.amazon.com/cdk/latest/guide/cli.html)
+
+---
+
 ## AWS CDK
 
 Refer to [cdk_instructions.md](./resources/cdk_instructions.md) for detailed instructions
 
 ---
 
-## Developers
+## Developer Instructions
 
 Refer to [developer_instructions.md](./resources/developer_instructions.md) for notes to Developers on this project
 
