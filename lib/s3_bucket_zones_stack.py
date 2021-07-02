@@ -105,8 +105,8 @@ class S3BucketZonesStack(cdk.Stack):
         Creates an AWS KMS Key and attaches a Key policy
 
         @param deployment_account_id: The id for the deployment account
-        @param logical_id_prefix:
-        @param resource_name_prefix:
+        @param logical_id str: The logical id prefix to apply to all CloudFormation resources
+        @param resource_name_prefix: The resource name prefix to apply to all resource names
         """
         s3_kms_key = kms.Key(
             self,
@@ -141,7 +141,7 @@ class S3BucketZonesStack(cdk.Stack):
         Creates an Amazon S3 bucket and attaches bucket policy with necessary guardrails.
         It enables server-side encryption using provided KMS key and leverage S3 bucket key feature.
 
-        @param logical_id str: The logical id prefix to apply to all CloudFormation resources
+        @param logical_id str: The logical id to apply to the bucket
         @param bucket_name str: The name for the bucket resource
         @param access_logs_bucket s3.Bucket: The bucket to target for Access Logging
         @param s3_kms_key kms.Key: The KMS Key to use for encryption of data at rest
@@ -223,7 +223,7 @@ class S3BucketZonesStack(cdk.Stack):
         Creates an Amazon S3 bucket to store S3 server access logs. It attaches bucket policy with necessary guardrails.
         It enables server-side encryption using provided KMS key and leverage S3 bucket key feature.
 
-        @param logical_id str: The logical id prefix to apply to all CloudFormation resources
+        @param logical_id str: The logical id to apply to the bucket
         @param bucket_name str: The name for the bucket resource
         @param s3_kms_key kms.Key: The KMS Key to use for encryption of data at rest
 
