@@ -14,28 +14,39 @@ This solution helps you:
 
 ## Contents
 
-* [Data lake architecture](#data-lake-architecture)
-* [Data lake infrastructure](#data-lake-infrastructure)
-* [Centralized deployment](#centralized-deployment)
-* [Continuous delivery of data lake infrastructure](#continuos-delivery-of-data-lake-etl-using-cdk-pipelines)
-* [Source code structure](#source-code-structure)
+* [Data lake](#data-lake)
+  * [Architecture](#architecture)
+  * [Infrastructure](#infrastructure)
+* [The solution](#the-solution)
+  * [Centralized deployment](#centralized-deployment)
+  * [Continuous delivery of data lake infrastructure](#continuos-delivery-of-data-lake-etl-using-cdk-pipelines)
+  * [Source code structure](#source-code-structure)
+  * [Automation scripts](#automation-scripts)
 * [Prerequisites](#prerequisites)
   * [Software installation](#software-installation)
+  * [Logistical requirements](#logistical-requirements)
   * [AWS environment bootstrapping](#aws-environment-bootstrapping)
   * [Application configuration](#application-configuration)
-  * [AWS CodePipeline and GitHub Integration](#aws-codepipeline-and-github-integration)
+  * [AWS CodePipeline and GitHub integration](#aws-codepipeline-and-github-integration)
 * [Deployment](#deployment)
   * [Deploying for the first time](#deploying-for-the-first-time)
   * [Iterative Deployment](#iterative-deployment)
-* [Clean Up](#clean-up)
-* [AWS CDK](#aws-cdk)
-* [Developer Instructions](#developer-instructions)
-* [Contributors](#contributors)
+* [Additional resources](#additional-resources)
+  * [Clean up](#clean-up)
+  * [AWS CDK](#aws-cdk)
+  * [Developer guide](#developer-guide)
+* [Authors and reviewers](#authors-and-reviewers)
 * [License Summary](#license-summary)
 
 ---
 
-## Data lake architecture
+## Data lake
+
+In this section we talk about Data lake architecture and its infrastructure.
+
+---
+
+### Architecture
 
 To level set, let us design a data lake. As shown in the figure below, we use Amazon S3 for storage. We use three S3 buckets - 1) raw bucket to store raw data in its original format 2) conformed bucket to store the data that meets the quality requirements of the lake 3) purpose-built data that is used by analysts and data consumers of the lake.
 
@@ -49,7 +60,7 @@ We use AWS Glue for ETL and data cataloging, Amazon Athena for interactive queri
 
 ---
 
-## Data lake infrastructure
+### Infrastructure
 
 Now we have the Data Lake design, let's deploy its infrastructure. It includes the following resources:
 
@@ -72,9 +83,15 @@ Figure below represents the infrastructure resources we provision for Data Lake.
 
 ---
 
-## Centralized deployment
+## The solution
 
-To demonstrate this feature, we need 4 AWS accounts as follows:
+We use a centralized deployment model to deploy data lake infrastructure across dev, test, and prod environments.
+
+---
+
+### Centralized deployment
+
+To demonstrate this solution, we need 4 AWS accounts as follows:
 
   1. Central deployment account to create CDK pipelines
   1. Dev account for dev data lake
@@ -95,7 +112,7 @@ There are few interesting details to point out here:
 
 ---
 
-## Continuous delivery of ETL jobs using CDK Pipelines
+### Continuous delivery of ETL jobs using CDK Pipelines
 
 Figure below illustrates the continuous delivery of ETL jobs on Data Lake.
 
@@ -108,7 +125,7 @@ There are few interesting details to point out here:
 1. CDK pipelines executes a multi-stage pipeline that includes, cloning the source code from GitHub repo, build the code, publish artifacts to S3 bucket, executes one or more stages/ Deployment of infrastructure resources is one of the stages
 1. CDK pipelines deploy the resources to dev, test, and prod environments
 
-## Source code structure
+### Source code structure
 
 Table below explains how this source ode structured:
 
@@ -120,11 +137,11 @@ Table below explains how this source ode structured:
   | [s3_bucket_zones_stack.py](./lib/s3_bucket_zones_stack.py) | Stack creates S3 buckets - raw, conformed, and purpose-built. This also creates an S3 bucket for server access logging and AWS KMS Key to enabled server side encryption for all buckets.|
   | [tagging.py](./lib/tagging.py) | Program to tag all provisioned resources. |
   | [vpc_stack.py](./lib/vpc_stack.py) | Contains all resources related to the VPC used by Data Lake infrastructure and services. This includes: VPC, Security Groups, and VPC Endpoints (both Gateway and Interface types). |
-  | resources| This folder has static content. For e.g. architecture diagrams.  |
+  | resources| This folder has static resources such as architecture diagrams, developer guide etc. |
 
 ---
 
-## Automation scripts
+### Automation scripts
 
 This repository has the following automation scripts to complete steps before the deployment:
 
@@ -140,6 +157,8 @@ This repository has the following automation scripts to complete steps before th
 
 This section has various steps you need to perform before you deploy data lake resources on AWS.
 
+---
+
 ### Software installation
 
 1. **AWS CLI** - make sure you have AWS CLI configured on your system. If not, refer to [Configuring the AWS CLI](https://docs.aws.amazon.com/cli/latest/userguide/cli-chap-configure.html) for more details.
@@ -152,7 +171,17 @@ This section has various steps you need to perform before you deploy data lake r
 
 1. **Python** - make sure you have Python SDK installed on your system. We recommend Python 3.7 and above.
 
-1. **Github Fork** - we recommend you [fork the repository](https://docs.github.com/en/get-started/quickstart/fork-a-repo) so you are in control of deployed resources.
+1. **GitHub Fork** - we recommend you [fork the repository](https://docs.github.com/en/get-started/quickstart/fork-a-repo) so you are in control of deployed resources.
+
+### Logistical requirements
+
+1. **Four AWS accounts.** One of them acts like a central deployment account. The other three are for dev, test, and prod accounts. **Optional:** To test this solution with central deployment account and one target environment for e.g. dev, refer to [developer_instructions.md](./resources/developer_instructions.md) for detailed instructions.
+
+1. **Number of branches on your GitHub repo** - You need to start with at least one branch for e.g. main to start using this solution. test and prod branches can be added at the beginning or after the deployment of data lake infrastructure on dev environment.
+
+1. **Administrator privileges** - you need to administrator privileges to bootstrap your AWS environments and complete initial deployment. Usually, these steps can be performed by a DevOps administrator of your team. After these steps, you can revoke administrative privileges. Subsequent deployments are based on self-mutating natures of CDK Pipelines.
+
+1. **AWS Region selection** - we recommend you to use the same AWS region (e.g. us-east-2) for deployment, dev, test, and prod accounts for simplicity. However, this is not a hard requirement.
 
 ---
 
@@ -350,31 +379,32 @@ Before we deploy our resources we must provide the manual variables and upon dep
     ```python
     local_mapping = {
         DEPLOYMENT: {
-            ACCOUNT_ID: 'deployment_account_id',
+            ACCOUNT_ID: 'add_your_deployment_account_id_here',
             REGION: 'us-east-2',
-            GITHUB_REPOSITORY_OWNER_NAME: 'aws-samples', # Note: Use your owner here!
-            GITHUB_REPOSITORY_NAME: 'aws-cdk-pipelines-datalake-infrastructure', # Note: Use your forked repo here!
-            # This is used in the Logical Id of CloudFormation resources.
-            # We recommend Capital case for consistency.
-            # Example: DataLakeCdkBlog
+            # If you use GitHub / GitHub Enterprise, this will be the organization name
+            GITHUB_REPOSITORY_OWNER_NAME: 'aws-samples',
+            # Use your forked repo here!
+            # This is used in the Logical Id of CloudFormation resources
+            # We recommend capital case for consistency. e.g. DataLakeCdkBlog
+            GITHUB_REPOSITORY_NAME: 'aws-cdk-pipelines-datalake-infrastructure',
             LOGICAL_ID_PREFIX: 'DataLakeCDKBlog',
-            # Important: This is used in resources that must be **globally** unique!
-            #   Resource names may only contain Alphanumeric and hyphens and cannot contain trailing hyphens.
-            # Example: unique-identifier-data-lake
+            # This is used in resources that must be globally unique!
+            # It may only contain alphanumeric characters, hyphens, and cannot contain trailing hyphens
+            # E.g. unique-identifier-data-lake
             RESOURCE_NAME_PREFIX: 'cdkblog-e2e',
         },
         DEV: {
-            ACCOUNT_ID: 'dev_account_id',
+            ACCOUNT_ID: 'add_your_dev_account_id_here',
             REGION: 'us-east-2',
             VPC_CIDR: '10.20.0.0/24'
         },
         TEST: {
-            ACCOUNT_ID: 'test_account_id',
+            ACCOUNT_ID: 'add_your_test_account_id_here',
             REGION: 'us-east-2',
             VPC_CIDR: '10.10.0.0/24'
         },
         PROD: {
-            ACCOUNT_ID: 'prod_account_id',
+            ACCOUNT_ID: 'add_your_prod_account_id_here',
             REGION: 'us-east-2',
             VPC_CIDR: '10.0.0.0/24'
         }
@@ -409,6 +439,8 @@ Integration between AWS CodePipeline and GitHub requires a personal access token
 
 ## Deployment
 
+---
+
 ### Deploying for the first time
 
 Configure your AWS profile to target the central Deployment account as an Administrator and perform the following steps:
@@ -435,6 +467,7 @@ Configure your AWS profile to target the central Deployment account as an Admini
 
     **Note:**
      1. Here, **DataLakeCDKBlog** string literal is the value of ```LOGICAL_ID_PREFIX``` configured in [configuration.py](./lib/configuration.py)
+     1. The first three stacks represent the CDK Pipeline stacks which will be created in the deployment account. For each, target environment, there will be three stacks.
 
 1. Set your environment variable back to deployment account
 
@@ -460,7 +493,13 @@ Pipeline you have created using CDK Pipelines module is self mutating. That mean
 
 ---
 
-## Clean up
+## Additional resources
+
+In this section, we provide some additional resources.
+
+---
+
+### Clean up
 
 1. Delete stacks using the command ```cdk destroy --all```. When you see the following text, enter **y**, and press enter/return.
 
@@ -477,7 +516,7 @@ Pipeline you have created using CDK Pipelines module is self mutating. That mean
    1. Dev-DevDataLakeCDKBlogInfrastructureIam
 
    **Note:**
-    1. Deletion of *Dev-DevDataLakeCDKBlogInfrastructureS3BucketZones* will delete the S3 buckets (raw, conformed, and purpose-built). This behavior can be changed by modifying the retention policy in [s3_bucket_zones_stack.py](lib/s3_bucket_zones_stack.py#L38)
+    1. Deletion of **Dev-DevDataLakeCDKBlogInfrastructureS3BucketZones** will delete the S3 buckets (raw, conformed, and purpose-built). This behavior can be changed by modifying the retention policy in [s3_bucket_zones_stack.py](lib/s3_bucket_zones_stack.py#L38)
 
 1. To delete stacks in **test** account, log onto Dev account, go to AWS CloudFormation console and delete the following stacks:
 
@@ -507,23 +546,30 @@ Pipeline you have created using CDK Pipelines module is self mutating. That mean
 
 ---
 
-## AWS CDK
+### AWS CDK
 
 Refer to [cdk_instructions.md](./resources/cdk_instructions.md) for detailed instructions
 
 ---
 
-## Developer Instructions
+### Developer guide
 
-Refer to [developer_instructions.md](./resources/developer_instructions.md) for notes to Developers on this project
+Refer to [developer_guide.md](./resources/developer_guide.md) for notes to Developers on this project
 
 ---
 
-## Contributors
+## Authors and reviewers
+
+The following people are involved in the design, architecture, development, and testing of this solution:
 
 1. **Isaiah Grant**, Cloud Consultant, 2nd Watch, Inc.
 1. **Ravi Itha**, Senior Data Architect, Amazon Web Services Inc.
 1. **Muhammad Zahid Ali**, Data Architect, Amazon Web Services Inc.
+
+The following people are involved in the reviews:
+
+1. **Mike Apted**, Principal Solutions Architect, Amazon Web Services Inc.
+1. **Nikunj Vaidya**, Senior DevOps Specialist, Amazon Web Services Inc.
 
 ---
 

@@ -20,6 +20,10 @@ The above will create a git hook which will validate code prior to commits. Conf
 * [.flake8](../.flake8)
 * [.pre-commit-config.yaml](../.pre-commit-config.yaml)
 
+## Use this solution for one deployment account and one target environment
+
+This is currently under development as of 07/02/2021
+
 ## Testing
 
 TODO

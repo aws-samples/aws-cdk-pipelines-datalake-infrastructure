@@ -49,10 +49,8 @@ def get_local_configuration(environment: str) -> dict:
     Provides manually configured variables that are validated for quality and safety.
 
     @param: environment str: The environment used to retrieve corresponding configuration
-
     @raises: Exception: Throws an exception if the resource_name_prefix does not conform
     @raises: Exception: Throws an exception if the requested environment does not exist
-
     @returns: dict:
     """
     local_mapping = {
@@ -60,14 +58,15 @@ def get_local_configuration(environment: str) -> dict:
             ACCOUNT_ID: '',
             REGION: 'us-east-2',
             GITHUB_REPOSITORY_OWNER_NAME: '',
+            # If you use GitHub / GitHub Enterprise, this will be the organization name
             GITHUB_REPOSITORY_NAME: '',
-            # This is used in the Logical Id of CloudFormation resources.
-            #   We recommend Capital case for consistency.
-            # Example: DataLakeCdkBlog
+            # Use your forked repo here!
+            # This is used in the Logical Id of CloudFormation resources
+            # We recommend capital case for consistency. e.g. DataLakeCdkBlog
             LOGICAL_ID_PREFIX: '',
-            # Important: This is used in resources that must be **globally** unique!
-            #   Resource names may only contain Alphanumeric and hyphens and cannot contain trailing hyphens.
-            # Example: unique-identifier-data-lake
+            # This is used in resources that must be globally unique!
+            # It may only contain alphanumeric characters, hyphens, and cannot contain trailing hyphens
+            # E.g. unique-identifier-data-lake
             RESOURCE_NAME_PREFIX: '',
         },
         DEV: {
