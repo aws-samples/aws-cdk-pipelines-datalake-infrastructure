@@ -260,13 +260,14 @@ Environment bootstrap is standard CDK process to prepare an AWS environment read
     }? (y/n)y
     ```
 
- 1. Expected output 1: In your terminal, you see ✅  Environment aws://deployment_account_id/us-east-2 bootstrapped.
+ 1. Expected outputs:
+    1. In your terminal, you see ✅  Environment aws://deployment_account_id/us-east-2 bootstrapped.
 
- 1. Expected output 2: you see a stack created in your deployment account as follows
+    1. You see a stack created in your deployment account as follows
 
-    ![bootstrap_central_deployment_account](./resources/bootstrap_central_deployment_account_exp_output.png)
+       ![bootstrap_central_deployment_account](./resources/bootstrap_central_deployment_account_exp_output.png)
 
- 1. Expected output 3: you see an S3 bucket created in central deployment account. The name is like ```cdk-hnb659fds-<assets-deployment_account_id>-us-east-2```
+    1. You see an S3 bucket created in central deployment account. The name is like ```cdk-hnb659fds-<assets-deployment_account_id>-us-east-2```
 
  1. Before you bootstrap **dev** account, set environment variable
 
@@ -292,13 +293,14 @@ Environment bootstrap is standard CDK process to prepare an AWS environment read
     } providing a trust relationship to: deployment_account_id using policy arn:aws:iam::aws:policy/AdministratorAccess? (y/n)
     ```
 
- 1. Expected output 1: In your terminal, you see ✅  Environment aws://dev_account_id/us-east-2 bootstrapped.
+ 1. Expected outputs:
+    1. In your terminal, you see ✅  Environment aws://dev_account_id/us-east-2 bootstrapped.
 
- 1. Expected output 2: you see a stack created in your deployment account as follows
+    1. You see a stack created in your deployment account as follows
 
-    ![bootstrap_central_deployment_account](./resources/bootstrap_central_deployment_account_exp_output.png)
+       ![bootstrap_central_deployment_account](./resources/bootstrap_central_deployment_account_exp_output.png)
 
- 1. Expected output 3: you see an S3 bucket created in central deployment account. The name is like ```cdk-hnb659fds-assets-<dev_account_id>-us-east-2```
+    1. You see an S3 bucket created in central deployment account. The name is like ```cdk-hnb659fds-assets-<dev_account_id>-us-east-2```
 
  1. Before you bootstrap **test** account, set environment variable
 
@@ -324,13 +326,14 @@ Environment bootstrap is standard CDK process to prepare an AWS environment read
     } providing a trust relationship to: deployment_account_id using policy arn:aws:iam::aws:policy/AdministratorAccess? (y/n)
     ```
 
- 1. Expected output 1: In your terminal, you see ✅  Environment aws://test_account_id/us-east-2 bootstrapped.
+ 1. Expected outputs:
+    1. In your terminal, you see ✅  Environment aws://test_account_id/us-east-2 bootstrapped.
 
- 1. Expected output 2: you see a stack created in your Deployment account as follows
+    1. You see a stack created in your Deployment account as follows
 
-    ![bootstrap_central_deployment_account](./resources/bootstrap_central_deployment_account_exp_output.png)
+        ![bootstrap_central_deployment_account](./resources/bootstrap_central_deployment_account_exp_output.png)
 
- 1. Expected output 3: you see an S3 bucket created in central deployment account. The name is like ```cdk-hnb659fds-assets-<test_account_id>-us-east-2```
+    1. You see an S3 bucket created in central deployment account. The name is like ```cdk-hnb659fds-assets-<test_account_id>-us-east-2```
 
  1. Before you bootstrap **prod** account, set environment variable
 
@@ -356,13 +359,14 @@ Environment bootstrap is standard CDK process to prepare an AWS environment read
     } providing a trust relationship to: deployment_account_id using policy arn:aws:iam::aws:policy/AdministratorAccess? (y/n)
     ```
 
- 1. Expected output 1: In your terminal, you see ✅  Environment aws://prod_account_id/us-east-2 bootstrapped.
+ 1. Expected outputs:
+    1. In your terminal, you see ✅  Environment aws://prod_account_id/us-east-2 bootstrapped.
 
- 1. Expected output 2: you see a stack created in your Deployment account as follows
+    1. You see a stack created in your Deployment account as follows
 
-    ![bootstrap_central_deployment_account](./resources/bootstrap_central_deployment_account_exp_output.png)
+        ![bootstrap_central_deployment_account](./resources/bootstrap_central_deployment_account_exp_output.png)
 
- 1. Expected output 3: you see an S3 bucket created in central deployment account. The name is like ```cdk-hnb659fds-assets-<prod_account_id>-us-east-2```
+    1. You see an S3 bucket created in central deployment account. The name is like ```cdk-hnb659fds-assets-<prod_account_id>-us-east-2```
 
 ---
 
