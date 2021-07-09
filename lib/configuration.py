@@ -41,7 +41,6 @@ S3_ACCESS_LOG_BUCKET = 's3_access_log_bucket'
 S3_RAW_BUCKET = 's3_raw_bucket'
 S3_CONFORMED_BUCKET = 's3_conformed_bucket'
 S3_PURPOSE_BUILT_BUCKET = 's3_purpose_built_bucket'
-CROSS_ACCOUNT_DYNAMODB_ROLE = 'cross_account_dynamodb_role'
 
 
 def get_local_configuration(environment: str) -> dict:
@@ -127,7 +126,6 @@ def get_environment_configuration(environment: str) -> dict:
         S3_RAW_BUCKET: f'{environment}RawBucketName',
         S3_CONFORMED_BUCKET: f'{environment}ConformedBucketName',
         S3_PURPOSE_BUILT_BUCKET: f'{environment}PurposeBuiltBucketName',
-        CROSS_ACCOUNT_DYNAMODB_ROLE: f'{environment}CrossAccountDynamoDbRoleArn'
     }
 
     return {**cloudformation_output_mapping, **get_local_configuration(environment)}

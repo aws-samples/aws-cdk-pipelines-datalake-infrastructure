@@ -4,7 +4,6 @@
 import aws_cdk.core as cdk
 from .vpc_stack import VpcStack
 from .s3_bucket_zones_stack import S3BucketZonesStack
-from .iam_stack import IamStack
 from .tagging import tag
 from .configuration import get_logical_id_prefix
 
@@ -43,13 +42,6 @@ class PipelineDeployStage(cdk.Stage):
             deployment_account_id=deployment_account_id,
             **kwargs,
         )
-        iam_stack = IamStack(
-            self,
-            f'{target_environment}{logical_id_prefix}InfrastructureIam',
-            target_environment=target_environment,
-            deployment_account_id=deployment_account_id,
-        )
 
         tag(vpc_stack, target_environment)
         tag(bucket_stack, target_environment)
-        tag(iam_stack, target_environment)
