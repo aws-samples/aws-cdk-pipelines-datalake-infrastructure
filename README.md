@@ -73,9 +73,7 @@ Now we have the Data Lake design, let's deploy its infrastructure. It includes t
     1. raw data
     1. conformed data
     1. purpose-built
- 1. Amazon DynamoDB tables for:
-    1. configuration metadata for ETL jobs
-    1. job audit table
+ 1. Amazon DynamoDB table for ETL jobs auditing
 
 Figure below represents the infrastructure resources we provision for Data Lake.
 
@@ -120,10 +118,12 @@ Figure below illustrates the continuous delivery of ETL jobs on Data Lake.
 
 There are few interesting details to point out here:
 
-1. DevOps administrator checks in the initial code
-1. DevOps administrator performs a one-time `cdk deploy --all` to deploy the data lake infrastructure to all target environments
-1. CDK pipelines executes a multi-stage pipeline that includes, cloning the source code from GitHub repo, build the code, publish artifacts to S3 bucket, executes one or more stages/ Deployment of infrastructure resources is one of the stages
-1. CDK pipelines deploy the resources to dev, test, and prod environments
+1. The DevOps administrator checks in the code to the repository.
+1. The DevOps administrator (with elevated access) facilitates a one-time manual deployment on a target environment. Elevated access includes administrative privileges on the central deployment account and target AWS environments.
+1. CodePipeline periodically listens to commit events on the source code repositories. This is the self-mutating nature of CodePipeline. It’s configured to work with and is able to update itself according to the provided definition.
+1. Code changes made to the main branch of the repo are automatically deployed to the dev environment of the data lake.
+1. Code changes to the test branch of the repo are automatically deployed to the test environment.
+1. Code changes to the prod branch of the repo are automatically deployed to the prod environment.
 
 ### Source code structure
 
@@ -481,13 +481,19 @@ Configure your AWS profile to target the central Deployment account as an Admini
 
 1. Run the command ```cdk deploy --all```
 
-1. Expected output 1: In the deployment account's CloudFormation console, you will see the following CloudFormation stacks created
+1. Expected outputs:
 
-   ![CloudFormation_stacks_in_deployment_account](./resources/cdk_deploy_output_deployment_account.png)
+   1. In the deployment account's CloudFormation console, you will see the following CloudFormation stacks created
 
-    Expected output 2: In the deployment account's CodePipeline console, you will see the following Pipeline triggered
+      ![CloudFormation_stacks_in_deployment_account](./resources/cdk_deploy_output_deployment_account.png)
 
-   ![CloudFormation_stacks_in_deployment_account](./resources/dev_codepipeline_in_deployment_account.png)
+   1. In the deployment account's CodePipeline console, you will see the following Pipeline triggered
+
+      ![CloudFormation_stacks_in_deployment_account](./resources/dev_codepipeline_in_deployment_account.png)
+
+   1. In the dev data lake account's CloudFormation console, you will see the following stacks are completed successfully
+
+      ![cdk_deploy_output_deployment_account_cfn_stacks](./resources/cdk_deploy_output_deployment_account_cfn_stacks.png)
 
 ---
 
@@ -552,13 +558,13 @@ In this section, we provide some additional resources.
 
 ### AWS CDK
 
-Refer to [cdk_instructions.md](./resources/cdk_instructions.md) for detailed instructions
+Refer to [CDK Instructions](./resources/cdk_instructions.md) for detailed instructions
 
 ---
 
 ### Developer guide
 
-Refer to [developer_guide.md](./resources/developer_guide.md) for notes to Developers on this project
+Refer to [Developer guide](./resources/developer_guide.md) for more details of this project.
 
 ---
 
