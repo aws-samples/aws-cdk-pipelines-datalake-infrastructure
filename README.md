@@ -110,9 +110,9 @@ There are few interesting details to point out here:
 
 ---
 
-### Continuous delivery of ETL jobs using CDK Pipelines
+### Continuous delivery of data lake infrastructure using CDK Pipelines
 
-Figure below illustrates the continuous delivery of ETL jobs on Data Lake.
+Figure below illustrates the continuous delivery of data lake infrastructure.
 
 ![Alt](./resources/Aws-cdk-pipelines-blog-datalake-continuous_delivery_data_lake_infra.png)
 
