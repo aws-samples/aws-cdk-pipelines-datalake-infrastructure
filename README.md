@@ -32,7 +32,7 @@ This solution helps you:
 * [Deployment](#deployment)
   * [Deploying for the first time](#deploying-for-the-first-time)
   * [Iterative Deployment](#iterative-deployment)
-* [What is next?](#what-is-next?)   
+* [Data lake ETL jobs](#data-lake-etl-jobs)
 * [Additional resources](#additional-resources)
   * [Clean up](#clean-up)
   * [AWS CDK](#aws-cdk)
@@ -505,7 +505,7 @@ Pipeline you have created using CDK Pipelines module is self mutating. That mean
 
 ---
 
-## What is next?
+## Data lake ETL jobs
 
 You can use the data lake infrastructure to deploy ETL jobs. We provided [AWS CDK Pipelines for Data Lake ETL Deployment](https://github.com/aws-samples/aws-cdk-pipelines-datalake-etl) to 
 help you accomplish this task.
