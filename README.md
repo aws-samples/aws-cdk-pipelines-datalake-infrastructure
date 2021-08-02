@@ -1,6 +1,7 @@
-# AWS CDK Pipelines for Data Lake Infrastructure Deployment
+# CDK Pipelines for Data Lake Infrastructure Deployment
 
-This solution helps you deploy data lake infrastructure on AWS using [AWS CDK Pipelines](https://docs.aws.amazon.com/cdk/latest/guide/cdk_pipeline.html).
+This solution helps you deploy data lake infrastructure on AWS using [CDK Pipelines](https://docs.aws.amazon.com/cdk/latest/guide/cdk_pipeline.html).
+This is based on AWS blog [Deploy data lake ETL jobs using CDK Pipelines](https://aws.amazon.com/blogs/devops/deploying-data-lake-etl-jobs-using-cdk-pipelines/). We recommend you to read the blog before you proceed with the solution.
 
 [CDK Pipelines](https://docs.aws.amazon.com/cdk/api/latest/docs/pipelines-readme.html) is a construct library module for painless continuous delivery of CDK applications. CDK stands for Cloud Development Kit. It is an open source software development framework to define your cloud application resources using familiar programming languages.
 
@@ -31,6 +32,7 @@ This solution helps you:
 * [Deployment](#deployment)
   * [Deploying for the first time](#deploying-for-the-first-time)
   * [Iterative Deployment](#iterative-deployment)
+* [What is next?](#what-is-next?)   
 * [Additional resources](#additional-resources)
   * [Clean up](#clean-up)
   * [AWS CDK](#aws-cdk)
@@ -500,6 +502,13 @@ Configure your AWS profile to target the central Deployment account as an Admini
 ### Iterative Deployment
 
 Pipeline you have created using CDK Pipelines module is self mutating. That means, code checked to GitHub repository branch will kick off CDK Pipeline mapped to that branch.
+
+---
+
+## What is next?
+
+You can use the data lake infrastructure to deploy ETL jobs. We provided [AWS CDK Pipelines for Data Lake ETL Deployment](https://github.com/aws-samples/aws-cdk-pipelines-datalake-etl) to 
+help you accomplish this task.
 
 ---
 
