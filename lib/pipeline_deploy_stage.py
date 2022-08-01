@@ -1,7 +1,8 @@
 # Copyright 2021 Amazon.com, Inc. or its affiliates. All Rights Reserved.
 # SPDX-License-Identifier: MIT-0
 
-import aws_cdk.core as cdk
+import aws_cdk as cdk
+from constructs import Construct
 from .vpc_stack import VpcStack
 from .s3_bucket_zones_stack import S3BucketZonesStack
 from .tagging import tag
@@ -10,8 +11,8 @@ from .configuration import get_logical_id_prefix
 
 class PipelineDeployStage(cdk.Stage):
     def __init__(
-        self, scope: cdk.Construct, construct_id: str,
-        target_environment: str, deployment_account_id: str,
+        self, scope: Construct, construct_id: str,
+        target_environment: str, deployment_account_id: str, env=None,
         **kwargs
     ):
         """
@@ -23,6 +24,7 @@ class PipelineDeployStage(cdk.Stage):
             this id (and any parent IDs) will be used to determine the physical ID of the stack.
         @param target_environment str: The target environment for stacks in the deploy stage
         @param deployment_account_id: The id for the deployment account
+        @env=None CDK Environment
         @param kwargs:
         """
         super().__init__(scope, construct_id, **kwargs)
@@ -33,6 +35,7 @@ class PipelineDeployStage(cdk.Stage):
             self,
             f'{target_environment}{logical_id_prefix}InfrastructureVpc',
             target_environment=target_environment,
+            env=env,
             **kwargs,
         )
         bucket_stack = S3BucketZonesStack(
@@ -40,6 +43,7 @@ class PipelineDeployStage(cdk.Stage):
             f'{target_environment}{logical_id_prefix}InfrastructureS3BucketZones',
             target_environment=target_environment,
             deployment_account_id=deployment_account_id,
+            env=env,
             **kwargs,
         )
 

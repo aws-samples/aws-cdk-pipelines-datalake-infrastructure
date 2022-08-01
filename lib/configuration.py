@@ -11,15 +11,15 @@ PROD = 'Prod'
 
 # The following constants are used to map to parameter/secret paths
 ENVIRONMENT = 'environment'
-
-# Manual Inputs
 GITHUB_REPOSITORY_OWNER_NAME = 'github_repository_owner_name'
 GITHUB_REPOSITORY_NAME = 'github_repository_name'
 ACCOUNT_ID = 'account_id'
 REGION = 'region'
+VPC_CIDR = 'vpc_cidr'
+
+# Manual Inputs
 LOGICAL_ID_PREFIX = 'logical_id_prefix'
 RESOURCE_NAME_PREFIX = 'resource_name_prefix'
-VPC_CIDR = 'vpc_cidr'
 
 # Secrets Manager Inputs
 GITHUB_TOKEN = 'github_token'

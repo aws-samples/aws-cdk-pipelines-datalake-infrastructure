@@ -1,7 +1,8 @@
 # Copyright 2021 Amazon.com, Inc. or its affiliates. All Rights Reserved.
 # SPDX-License-Identifier: MIT-0
 
-import aws_cdk.core as cdk
+import aws_cdk as cdk
+from constructs import Construct
 import aws_cdk.aws_ec2 as ec2
 from .configuration import (
     AVAILABILITY_ZONE_1, AVAILABILITY_ZONE_2, AVAILABILITY_ZONE_3, ROUTE_TABLE_1, ROUTE_TABLE_2, ROUTE_TABLE_3,
@@ -12,11 +13,11 @@ from .configuration import (
 
 class VpcStack(cdk.Stack):
 
-    def __init__(self, scope: cdk.Construct, construct_id: str, target_environment: str, **kwargs) -> None:
+    def __init__(self, scope: Construct, construct_id: str, target_environment: str, **kwargs) -> None:
         """
         CloudFormation stack to create AWS KMS Key, Amazon S3 resources such as buckets and bucket policies.
 
-        @param scope cdk.Construct:
+        @param scope Construct:
             Parent of this stack, usually an App or a Stage, but could be any construct.:
         @param construct_id str:
             The construct ID of this stack. If stackName is not explicitly defined,
@@ -28,13 +29,18 @@ class VpcStack(cdk.Stack):
         mappings = get_environment_configuration(target_environment)
         vpc_cidr = mappings[VPC_CIDR]
         logical_id_prefix = get_logical_id_prefix()
-        vpc = ec2.Vpc(self, f'{logical_id_prefix}Vpc', cidr=vpc_cidr)
+        vpc = ec2.Vpc(
+            self,
+            f'{logical_id_prefix}Vpc',
+            cidr=vpc_cidr,
+            max_azs=3,
+        )        
         shared_security_group_ingress = ec2.SecurityGroup(
             self,
             f'{target_environment}{logical_id_prefix}SharedIngressSecurityGroup',
             vpc=vpc,
             description='Shared Security Group for Data Lake resources with self-referencing ingress rule.',
-            security_group_name=f'{target_environment}{logical_id_prefix}SharedIngressSecurityGroup',
+            #security_group_name=f'{target_environment}{logical_id_prefix}SharedIngressSecurityGroup',
         )
         shared_security_group_ingress.add_ingress_rule(
             peer=shared_security_group_ingress,

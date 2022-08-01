@@ -1,7 +1,7 @@
 # Copyright 2021 Amazon.com, Inc. or its affiliates. All Rights Reserved.
 # SPDX-License-Identifier: MIT-0
 
-import aws_cdk.core as cdk
+import aws_cdk as cdk
 
 from .configuration import (
     get_logical_id_prefix, get_resource_name_prefix,
