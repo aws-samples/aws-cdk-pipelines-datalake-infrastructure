@@ -584,6 +584,7 @@ The following people are involved in the design, architecture, development, and 
 1. **Isaiah Grant**, Cloud Consultant, 2nd Watch, Inc.
 1. **Ravi Itha**, Senior Data Architect, Amazon Web Services Inc.
 1. **Muhammad Zahid Ali**, Data Architect, Amazon Web Services Inc.
+1. **Justiono Putro**, Cloud Infrastructure Architect, Amazon Web Services
 
 The following people are involved in the reviews:
 
