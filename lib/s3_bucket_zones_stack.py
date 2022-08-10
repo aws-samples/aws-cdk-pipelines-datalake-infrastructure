@@ -57,13 +57,13 @@ class S3BucketZonesStack(cdk.Stack):
         )
         conformed_bucket = self.create_data_lake_zone_bucket(
             f'{target_environment}{logical_id_prefix}ConformedBucket',
-            f'{target_environment.lower()}-{resource_name_prefix}-{self.account}-{self.region}-conformed',
+            f'{target_environment.lower()}-{resource_name_prefix}-{self.account}-{self.region}-staging',
             access_logs_bucket,
             s3_kms_key,
         )
         purpose_built_bucket = self.create_data_lake_zone_bucket(
             f'{target_environment}{logical_id_prefix}PurposeBuiltBucket',
-            f'{target_environment.lower()}-{resource_name_prefix}-{self.account}-{self.region}-purpose-built',
+            f'{target_environment.lower()}-{resource_name_prefix}-{self.account}-{self.region}-curated',
             access_logs_bucket,
             s3_kms_key,
         )
@@ -89,13 +89,13 @@ class S3BucketZonesStack(cdk.Stack):
         )
         cdk.CfnOutput(
             self,
-            f'{target_environment}{logical_id_prefix}ConformedBucketName',
+            f'{target_environment}{logical_id_prefix}SatgingBucketName',
             value=conformed_bucket.bucket_name,
             export_name=mappings[S3_CONFORMED_BUCKET]
         )
         cdk.CfnOutput(
             self,
-            f'{target_environment}{logical_id_prefix}PurposeBuiltBucketName',
+            f'{target_environment}{logical_id_prefix}CuratedBucketName',
             value=purpose_built_bucket.bucket_name,
             export_name=mappings[S3_PURPOSE_BUILT_BUCKET]
         )

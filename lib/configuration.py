@@ -13,13 +13,13 @@ PROD = 'Prod'
 ENVIRONMENT = 'environment'
 
 # Manual Inputs
-GITHUB_REPOSITORY_OWNER_NAME = 'github_repository_owner_name'
-GITHUB_REPOSITORY_NAME = 'github_repository_name'
-ACCOUNT_ID = 'account_id'
-REGION = 'region'
-LOGICAL_ID_PREFIX = 'logical_id_prefix'
-RESOURCE_NAME_PREFIX = 'resource_name_prefix'
-VPC_CIDR = 'vpc_cidr'
+GITHUB_REPOSITORY_OWNER_NAME = 'BranfordTGbieor'
+GITHUB_REPOSITORY_NAME = 'aws-cdk-pipelines-datalake-infrastructure'
+ACCOUNT_ID = '829553079673'
+REGION = 'us-east-1'
+LOGICAL_ID_PREFIX = 'DataLakeCDKLMD'
+RESOURCE_NAME_PREFIX = 'lmd'
+VPC_CIDR = '10.20.0.0/24'
 
 # Secrets Manager Inputs
 GITHUB_TOKEN = 'github_token'
@@ -39,8 +39,8 @@ SHARED_SECURITY_GROUP_ID = 'shared_security_group_id'
 S3_KMS_KEY = 's3_kms_key'
 S3_ACCESS_LOG_BUCKET = 's3_access_log_bucket'
 S3_RAW_BUCKET = 's3_raw_bucket'
-S3_CONFORMED_BUCKET = 's3_conformed_bucket'
-S3_PURPOSE_BUILT_BUCKET = 's3_purpose_built_bucket'
+S3_CONFORMED_BUCKET = 's3_staging_bucket'
+S3_PURPOSE_BUILT_BUCKET = 's3_curated_bucket'
 
 
 def get_local_configuration(environment: str) -> dict:
@@ -54,33 +54,33 @@ def get_local_configuration(environment: str) -> dict:
     """
     local_mapping = {
         DEPLOYMENT: {
-            ACCOUNT_ID: '',
-            REGION: 'us-east-2',
-            GITHUB_REPOSITORY_OWNER_NAME: '',
+            ACCOUNT_ID: '829553079673',
+            REGION: 'us-east-1',
+            GITHUB_REPOSITORY_OWNER_NAME: 'BranfordTGbieor',
             # If you use GitHub / GitHub Enterprise, this will be the organization name
-            GITHUB_REPOSITORY_NAME: '',
+            GITHUB_REPOSITORY_NAME: 'aws-cdk-pipelines-datalake-infrastructure',
             # Use your forked repo here!
             # This is used in the Logical Id of CloudFormation resources
             # We recommend capital case for consistency. e.g. DataLakeCdkBlog
-            LOGICAL_ID_PREFIX: '',
+            LOGICAL_ID_PREFIX: 'DataLakeCDKLMD',
             # This is used in resources that must be globally unique!
             # It may only contain alphanumeric characters, hyphens, and cannot contain trailing hyphens
             # E.g. unique-identifier-data-lake
-            RESOURCE_NAME_PREFIX: '',
+            RESOURCE_NAME_PREFIX: 'lmd',
         },
         DEV: {
-            ACCOUNT_ID: '',
-            REGION: 'us-east-2',
+            ACCOUNT_ID: '002190277880',
+            REGION: 'us-east-1',
             VPC_CIDR: '10.20.0.0/24'
         },
         TEST: {
-            ACCOUNT_ID: '',
-            REGION: 'us-east-2',
+            ACCOUNT_ID: '576140831944',
+            REGION: 'us-east-1',
             VPC_CIDR: '10.10.0.0/24'
         },
         PROD: {
-            ACCOUNT_ID: '',
-            REGION: 'us-east-2',
+            ACCOUNT_ID: '301323023124',
+            REGION: 'us-east-1',
             VPC_CIDR: '10.0.0.0/24'
         }
     }

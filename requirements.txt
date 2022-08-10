@@ -21,3 +21,11 @@ aws-cdk.aws-ssm~=1.109.0
 aws-cdk.core~=1.109.0
 aws-cdk.pipelines~=1.109.0
 boto3~=1.17.97
+aws-cdk.aws-glue
+aws-cdk.aws-stepfunctions
+aws-cdk.aws-stepfunctions-tasks
+aws-cdk.lambda-layer-awscli
+aws-cdk.aws-lambda-event-sources
+aws-cdk.aws-lambda
+aws-cdk.aws-sns-subscriptions
+aws-cdk.aws-sns
