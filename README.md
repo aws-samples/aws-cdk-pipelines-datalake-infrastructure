@@ -12,8 +12,8 @@ This solution helps you:
 1. increase the speed of prototyping, testing, and deployment of new ETL workloads
 
 This solution is available in two CDK versions:
-1. [CDK v1](https://docs.aws.amazon.com/cdk/v1/guide/home.html) - use **main** brach.
-1. [CDK v2](https://docs.aws.amazon.com/cdk/v2/guide/migrating-v2.html) - use **cdkv2** brach and is recommended.
+1. [CDK v1](https://docs.aws.amazon.com/cdk/v1/guide/home.html) - use **main** branch.
+1. [CDK v2](https://docs.aws.amazon.com/cdk/v2/guide/migrating-v2.html) - use **cdkv2** branch and is recommended.
 
 ---
 
