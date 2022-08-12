@@ -584,12 +584,15 @@ The following people are involved in the design, architecture, development, and 
 1. **Isaiah Grant**, Cloud Consultant, 2nd Watch, Inc.
 1. **Ravi Itha**, Senior Data Architect, Amazon Web Services Inc.
 1. **Muhammad Zahid Ali**, Data Architect, Amazon Web Services Inc.
-1. **Justiono Putro**, Cloud Infrastructure Architect, Amazon Web Services
 
 The following people are involved in the reviews:
 
 1. **Mike Apted**, Principal Solutions Architect, Amazon Web Services Inc.
 1. **Nikunj Vaidya**, Senior DevOps Specialist, Amazon Web Services Inc.
+
+Following people involved in releasing [CDK v2](https://docs.aws.amazon.com/cdk/v2/guide/migrating-v2.html) based solution.
+
+1. **Justiono Putro**, Cloud Infrastructure Architect, Amazon Web Services Inc.
 
 ---
 
