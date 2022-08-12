@@ -11,6 +11,10 @@ This solution helps you:
 1. leverage the benefit of self-mutating feature of CDK Pipelines. For example, whenever you check your CDK app's source code in to your version control system, CDK Pipelines can automatically build, test, and deploy your new version
 1. increase the speed of prototyping, testing, and deployment of new ETL workloads
 
+This solution is available in two CDK versions:
+1. [CDK v1](https://docs.aws.amazon.com/cdk/v1/guide/home.html) - use **main** brach
+1. [CDK v2](https://docs.aws.amazon.com/cdk/v2/guide/migrating-v2.html) - use **cdkv2** brach and is recommended.
+
 ---
 
 ## Contents
